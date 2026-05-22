@@ -701,8 +701,8 @@
         filtered = filtered.filter(b => b.tags.includes(activeTag));
       }
 
-      if (searchQuery) {
-        const q = searchQuery.toLowerCase();
+      const q = searchQuery.trim().toLowerCase();
+      if (q) {
         filtered = filtered.filter(b =>
           b.title.toLowerCase().includes(q) ||
           b.url.toLowerCase().includes(q) ||
@@ -721,8 +721,8 @@
         if (bookmarks.length === 0) {
           emptyP.textContent  = 'No bookmarks yet.';
           emptyHint.innerHTML = 'Click <strong>+ Add Bookmark</strong> to save your first link.';
-        } else if (searchQuery) {
-          emptyP.textContent  = `No results for "${searchQuery}".`;
+        } else if (q) {
+          emptyP.textContent  = `No results for "${q}".`;
           emptyHint.textContent = 'Try a different search term.';
         } else {
           emptyP.textContent    = `No bookmarks tagged "${activeTag}".`;
@@ -1041,7 +1041,7 @@
     // ── Search ───────────────────────────────────────────────────────────────
 
     document.getElementById('search').addEventListener('input', e => {
-      searchQuery = e.target.value.trim();
+      searchQuery = e.target.value;
       renderAll();
     });
 
