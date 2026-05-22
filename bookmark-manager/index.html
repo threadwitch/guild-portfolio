@@ -701,6 +701,18 @@
       list.innerHTML = '';
 
       if (filtered.length === 0) {
+        const emptyP    = empty.querySelector('p');
+        const emptyHint = empty.querySelector('.hint');
+        if (bookmarks.length === 0) {
+          emptyP.textContent  = 'No bookmarks yet.';
+          emptyHint.innerHTML = 'Click <strong>+ Add Bookmark</strong> to save your first link.';
+        } else if (searchQuery) {
+          emptyP.textContent  = `No results for "${searchQuery}".`;
+          emptyHint.textContent = 'Try a different search term.';
+        } else {
+          emptyP.textContent    = `No bookmarks tagged "${activeTag}".`;
+          emptyHint.textContent = 'Select a different tag or clear the filter.';
+        }
         empty.style.display = 'flex';
       } else {
         empty.style.display = 'none';
