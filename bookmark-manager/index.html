@@ -556,9 +556,24 @@
 
     // ── Storage helpers ──────────────────────────────────────────────────────
 
+    function normalizeBookmark(b) {
+      if (!b || typeof b !== 'object') return null;
+      return {
+        id:        typeof b.id        === 'number' ? b.id : Date.now(),
+        url:       typeof b.url       === 'string' ? b.url   : '',
+        title:     typeof b.title     === 'string' ? b.title : '',
+        notes:     typeof b.notes     === 'string' ? b.notes : '',
+        tags:      Array.isArray(b.tags) ? b.tags.filter(t => typeof t === 'string') : [],
+        createdAt: typeof b.createdAt === 'string' ? b.createdAt : new Date().toISOString(),
+      };
+    }
+
     function load() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-      catch { return []; }
+      try {
+        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (!Array.isArray(parsed)) return [];
+        return parsed.map(normalizeBookmark).filter(Boolean);
+      } catch { return []; }
     }
 
     let toastTimer;
