@@ -203,7 +203,7 @@ The add modal takes keyboard input just fine and is keyboard navigable. The inli
 **Priority:** Medium
 **Reasoning:** Key missing functionality and it's inconsistent.
 
-### PROCESS.md misattributes the "Known Issues" scope
+### 23. PROCESS.md misattributes the "Known Issues" scope
 The "Known Issues" section only includes the animation issue, and none of the other issues that the reviewer identified.
 
 **Validity:** Not Valid

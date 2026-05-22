@@ -252,6 +252,12 @@
     }
     .card-url:hover { color: var(--accent); text-decoration: underline; }
 
+    .card-date {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
     .card-notes {
       font-size: 12px;
       color: var(--text-muted);
@@ -632,6 +638,16 @@
       catch { return ''; }
     }
 
+    function formatDate(isoString) {
+      try {
+        const d = new Date(isoString);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      } catch { return ''; }
+    }
+
     function updateBookmark(id, data) {
       const bookmarks = load();
       const idx = bookmarks.findIndex(b => b.id === id);
@@ -821,6 +837,13 @@
 
       card.appendChild(header);
       card.appendChild(url);
+
+      if (b.createdAt) {
+        const dateEl = document.createElement('div');
+        dateEl.className = 'card-date';
+        dateEl.textContent = formatDate(b.createdAt);
+        card.appendChild(dateEl);
+      }
 
       if (b.notes) {
         const notes = document.createElement('div');
