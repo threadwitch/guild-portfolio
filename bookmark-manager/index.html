@@ -774,12 +774,14 @@
 
       const editBtn = document.createElement('button');
       editBtn.textContent = 'Edit';
+      editBtn.setAttribute('aria-label', `Edit "${b.title}"`);
       editBtn.addEventListener('click', () => enterEditMode(card, b));
       actions.appendChild(editBtn);
 
       const delBtn = document.createElement('button');
       delBtn.className = 'btn-delete';
       delBtn.textContent = 'Delete';
+      delBtn.setAttribute('aria-label', `Delete "${b.title}"`);
       delBtn.addEventListener('click', () => {
         while (actions.firstChild) actions.removeChild(actions.firstChild);
 
@@ -789,11 +791,13 @@
 
         const cancelBtn = document.createElement('button');
         cancelBtn.textContent = 'Cancel';
+        cancelBtn.setAttribute('aria-label', `Cancel deleting "${b.title}"`);
         cancelBtn.addEventListener('click', () => fillCard(card, b));
 
         const confirmBtn = document.createElement('button');
         confirmBtn.className = 'btn-delete-confirm';
         confirmBtn.textContent = 'Confirm';
+        confirmBtn.setAttribute('aria-label', `Confirm delete "${b.title}"`);
         confirmBtn.addEventListener('click', () => {
           deleteBookmark(b.id);
           renderAll();
@@ -831,11 +835,14 @@
       card.innerHTML = '';
       animateSwap(card);
 
-      function makeEditField(labelText, inputEl, hint) {
+      function makeEditField(labelText, inputEl, fieldName, hint) {
+        const id = `edit-${b.id}-${fieldName}`;
+        inputEl.id = id;
         const wrap = document.createElement('div');
         wrap.className = 'edit-field';
         const lbl = document.createElement('label');
         lbl.textContent = labelText;
+        lbl.htmlFor = id;
         wrap.appendChild(lbl);
         wrap.appendChild(inputEl);
         if (hint) {
@@ -851,16 +858,16 @@
       }
 
       const eUrl = Object.assign(document.createElement('input'), { type: 'url', value: b.url });
-      const { wrap: urlWrap, err: urlErr } = makeEditField('URL', eUrl);
+      const { wrap: urlWrap, err: urlErr } = makeEditField('URL', eUrl, 'url');
 
       const eTitle = Object.assign(document.createElement('input'), { type: 'text', value: b.title });
-      const { wrap: titleWrap, err: titleErr } = makeEditField('Title', eTitle);
+      const { wrap: titleWrap, err: titleErr } = makeEditField('Title', eTitle, 'title');
 
       const eNotes = Object.assign(document.createElement('textarea'), { value: b.notes });
-      const { wrap: notesWrap } = makeEditField('Notes', eNotes);
+      const { wrap: notesWrap } = makeEditField('Notes', eNotes, 'notes');
 
       const eTags = Object.assign(document.createElement('input'), { type: 'text', value: b.tags.join(', ') });
-      const { wrap: tagsWrap } = makeEditField('Tags', eTags, 'Separate tags with commas.');
+      const { wrap: tagsWrap } = makeEditField('Tags', eTags, 'tags', 'Separate tags with commas.');
 
       card.appendChild(urlWrap);
       card.appendChild(titleWrap);
@@ -873,11 +880,13 @@
       const cancelBtn = document.createElement('button');
       cancelBtn.className = 'btn-cancel';
       cancelBtn.textContent = 'Cancel';
+      cancelBtn.setAttribute('aria-label', `Cancel editing "${b.title}"`);
       cancelBtn.addEventListener('click', () => fillCard(card, b));
 
       const saveBtn = document.createElement('button');
       saveBtn.className = 'btn-save';
       saveBtn.textContent = 'Save';
+      saveBtn.setAttribute('aria-label', `Save changes to "${b.title}"`);
       saveBtn.addEventListener('click', () => {
         const newUrl = eUrl.value.trim();
         const newTitle = eTitle.value.trim();
