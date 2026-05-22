@@ -297,6 +297,12 @@
     }
     .card-actions button:hover { color: var(--text); background: var(--surface-hi); }
     .card-actions .btn-delete:hover { color: var(--error); background: transparent; }
+    .card-actions .delete-confirm-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 2px 4px;
+    }
+    .card-actions .btn-delete-confirm { color: var(--error); }
 
     /* ── Modal ── */
     .modal-backdrop {
@@ -775,8 +781,28 @@
       delBtn.className = 'btn-delete';
       delBtn.textContent = 'Delete';
       delBtn.addEventListener('click', () => {
-        deleteBookmark(b.id);
-        renderAll();
+        while (actions.firstChild) actions.removeChild(actions.firstChild);
+
+        const label = document.createElement('span');
+        label.className = 'delete-confirm-label';
+        label.textContent = 'Delete?';
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.addEventListener('click', () => fillCard(card, b));
+
+        const confirmBtn = document.createElement('button');
+        confirmBtn.className = 'btn-delete-confirm';
+        confirmBtn.textContent = 'Confirm';
+        confirmBtn.addEventListener('click', () => {
+          deleteBookmark(b.id);
+          renderAll();
+        });
+
+        actions.appendChild(label);
+        actions.appendChild(cancelBtn);
+        actions.appendChild(confirmBtn);
+        cancelBtn.focus();
       });
       actions.appendChild(delBtn);
       footer.appendChild(actions);
