@@ -632,6 +632,8 @@
       bookmarks.forEach(b => b.tags.forEach(t => { counts[t] = (counts[t] || 0) + 1; }));
       const tags = Object.keys(counts).sort();
 
+      if (activeTag !== 'All' && !tags.includes(activeTag)) activeTag = 'All';
+
       const list = document.getElementById('tag-list');
       list.innerHTML = '';
 
