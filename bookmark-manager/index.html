@@ -877,18 +877,10 @@
       const actions = document.createElement('div');
       actions.className = 'edit-actions';
 
-      const cancelBtn = document.createElement('button');
-      cancelBtn.className = 'btn-cancel';
-      cancelBtn.textContent = 'Cancel';
-      cancelBtn.setAttribute('aria-label', `Cancel editing "${b.title}"`);
-      cancelBtn.addEventListener('click', () => fillCard(card, b));
+      function cancelEdit() { fillCard(card, b); }
 
-      const saveBtn = document.createElement('button');
-      saveBtn.className = 'btn-save';
-      saveBtn.textContent = 'Save';
-      saveBtn.setAttribute('aria-label', `Save changes to "${b.title}"`);
-      saveBtn.addEventListener('click', () => {
-        const newUrl = eUrl.value.trim();
+      function commitEdit() {
+        const newUrl   = eUrl.value.trim();
         const newTitle = eTitle.value.trim();
         let ok = true;
 
@@ -913,7 +905,29 @@
           tags: parseTags(eTags.value),
         });
         renderAll();
+      }
+
+      [eUrl, eTitle, eTags].forEach(input => {
+        input.addEventListener('keydown', e => {
+          if (e.key === 'Enter')  { e.preventDefault(); commitEdit(); }
+          if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
+        });
       });
+      eNotes.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
+      });
+
+      const cancelBtn = document.createElement('button');
+      cancelBtn.className = 'btn-cancel';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.setAttribute('aria-label', `Cancel editing "${b.title}"`);
+      cancelBtn.addEventListener('click', cancelEdit);
+
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'btn-save';
+      saveBtn.textContent = 'Save';
+      saveBtn.setAttribute('aria-label', `Save changes to "${b.title}"`);
+      saveBtn.addEventListener('click', commitEdit);
 
       actions.appendChild(cancelBtn);
       actions.appendChild(saveBtn);
