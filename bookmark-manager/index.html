@@ -743,7 +743,6 @@
 
     function fillCard(card, b) {
       card.innerHTML = '';
-      animateSwap(card);
 
       const header = document.createElement('div');
       header.className = 'card-header';
@@ -831,6 +830,7 @@
       }
 
       card.appendChild(footer);
+      animateSwap(card);
     }
 
     function makeCard(b) {
@@ -842,7 +842,6 @@
 
     function enterEditMode(card, b) {
       card.innerHTML = '';
-      animateSwap(card);
 
       function makeEditField(labelText, inputEl, fieldName, hint) {
         const id = `edit-${b.id}-${fieldName}`;
@@ -941,6 +940,7 @@
       actions.appendChild(cancelBtn);
       actions.appendChild(saveBtn);
       card.appendChild(actions);
+      animateSwap(card);
 
       eUrl.focus();
     }
