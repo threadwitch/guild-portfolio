@@ -574,7 +574,7 @@
     function normalizeBookmark(b) {
       if (!b || typeof b !== 'object') return null;
       return {
-        id:        typeof b.id        === 'number' ? b.id : Date.now(),
+        id:        (typeof b.id === 'string' || typeof b.id === 'number') ? b.id : crypto.randomUUID(),
         url:       typeof b.url       === 'string' ? b.url   : '',
         title:     typeof b.title     === 'string' ? b.title : '',
         notes:     typeof b.notes     === 'string' ? b.notes : '',
@@ -613,7 +613,7 @@
     function addBookmark(data) {
       const bookmarks = load();
       bookmarks.unshift({
-        id: Date.now(),
+        id: crypto.randomUUID(),
         url: data.url,
         title: data.title,
         notes: data.notes,
