@@ -980,8 +980,7 @@
       try {
         const u = new URL(str);
         return (u.protocol === 'http:' || u.protocol === 'https:') &&
-               /^https?:\/\/[^/]/.test(str) &&
-               u.hostname.includes('.');
+               /^https?:\/\/[^/]/.test(str);
       } catch { return false; }
     }
 
