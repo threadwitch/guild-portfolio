@@ -210,3 +210,45 @@ The "Known Issues" section only includes the animation issue, and none of the ot
 **Priority:** N/A
 **Reasoning:** This is flagging the fact that I wasn't aware of errors as an error in and of itself, and this is rectified by the review.
 
+---
+
+## Review 1 — Remediation
+
+All 22 valid issues from Review 1 were resolved in a single session. Issues 16 and 23 were marked not valid and left as-is.
+
+### What was fixed
+
+**Security**
+- **1.** Replaced `innerHTML` in `makeTagButton` with DOM methods, closing the stored XSS vector via tag input.
+
+**Data integrity**
+- **2.** Wrapped `localStorage.setItem` in a try/catch; quota errors now surface a toast notification rather than silently failing.
+- **3.** Added `normalizeBookmark` called on every `load()`, coercing missing or malformed fields to safe defaults and rejecting non-array stored values entirely.
+- **15.** Replaced `Date.now()` IDs with `crypto.randomUUID()` to eliminate the millisecond collision window.
+
+**Functional bugs**
+- **4.** Reset `activeTag` to `'All'` in `renderSidebar` when the active tag no longer exists in the bookmark set.
+- **5.** Empty state now shows context-appropriate messages: no bookmarks, no search results, or no results for the active tag filter.
+- **13.** Removed the `hostname.includes('.')` check from `isValidUrl`; `localhost` and bare hostnames are now accepted.
+- **14.** Reset `activeTag` to `'All'` on successful add so a newly saved bookmark is always visible.
+- **18.** Moved `animateSwap` to after content is inserted in both `fillCard` and `enterEditMode`, fixing the flash-of-empty-space that was the original known animation issue.
+- **19.** Stored raw search input in `searchQuery` and trimmed only at point of use, keeping display and match behaviour in sync.
+- **20.** `createdAt` is now displayed on each card in local-timezone ISO-8601 format (`YYYY-MM-DD`).
+
+**UX**
+- **6.** Delete button now shows an inline confirmation step (Delete? / Cancel / Confirm) before committing.
+- **7.** Enter-to-save in the add modal is now restricted to the URL, Title, and Tags inputs; focused buttons no longer race with the save handler.
+- **14.** (See above.)
+- **22.** Inline edit form now supports Enter to save (on URL, Title, Tags) and Escape to cancel on all fields, matching the add modal's keyboard behaviour.
+
+**Accessibility**
+- **8.** Added a Tab/Shift+Tab focus trap to the add modal.
+- **9.** Inline edit labels now have `for`/`id` associations via a `fieldName` parameter in `makeEditField`.
+- **10.** All action buttons (card Edit/Delete, inline edit Cancel/Save, delete confirmation) now carry descriptive `aria-label` values including the bookmark title.
+- **11.** `<header>` and `.body` are set `inert` while the modal is open, hiding background content from assistive technology. Focus returns to the Add button on close.
+- **12.** Added `@media (prefers-reduced-motion: reduce)` block collapsing all animation and transition durations.
+- **21.** Added `aria-labelledby` to `<aside>` pointing to the Tags `<h2>`.
+
+**Code quality**
+- **17.** Extracted the hardcoded tag border colour `#1e3a5f` into a `--tag-border` CSS custom property alongside `--tag-bg` and `--tag-color`.
+
