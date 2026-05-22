@@ -604,7 +604,13 @@
     function makeTagButton(label, count) {
       const li = document.createElement('li');
       const btn = document.createElement('button');
-      btn.innerHTML = `<span>${label}</span><span class="count">${count}</span>`;
+      const labelSpan = document.createElement('span');
+      labelSpan.textContent = label;
+      const countSpan = document.createElement('span');
+      countSpan.className = 'count';
+      countSpan.textContent = count;
+      btn.appendChild(labelSpan);
+      btn.appendChild(countSpan);
       if (label === activeTag) btn.classList.add('active');
       btn.addEventListener('click', () => {
         activeTag = label;
