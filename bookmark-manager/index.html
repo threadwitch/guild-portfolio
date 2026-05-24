@@ -581,7 +581,7 @@
       if (!b || typeof b !== 'object') return null;
       return {
         id:        (typeof b.id === 'string' || typeof b.id === 'number') ? b.id : crypto.randomUUID(),
-        url:       typeof b.url       === 'string' ? b.url   : '',
+        url:       typeof b.url === 'string' && !/^javascript:/i.test(b.url.trim()) ? b.url : '',
         title:     typeof b.title     === 'string' ? b.title : '',
         notes:     typeof b.notes     === 'string' ? b.notes : '',
         tags:      Array.isArray(b.tags) ? b.tags.filter(t => typeof t === 'string') : [],
