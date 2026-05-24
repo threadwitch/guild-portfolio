@@ -630,7 +630,9 @@
     }
 
     function deleteBookmark(id) {
-      save(load().filter(b => b.id !== id));
+      const bookmarks = load();
+      if (!bookmarks.some(b => b.id === id)) return;
+      save(bookmarks.filter(b => b.id !== id));
     }
 
     function extractDomain(url) {
