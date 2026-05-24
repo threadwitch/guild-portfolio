@@ -850,6 +850,13 @@
         confirmBtn.addEventListener('click', () => {
           deleteBookmark(b.id);
           renderAll();
+          const firstCard = document.querySelector('#bookmark-list .card');
+          if (firstCard) {
+            const firstBtn = firstCard.querySelector('button');
+            if (firstBtn) firstBtn.focus();
+          } else {
+            btnAdd.focus();
+          }
         });
 
         actions.appendChild(label);
