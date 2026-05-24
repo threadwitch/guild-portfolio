@@ -1028,7 +1028,7 @@
     const errUrl    = document.getElementById('err-url');
     const errTitle  = document.getElementById('err-title');
     const btnAdd    = document.getElementById('btn-add');
-    const bgRegions = [document.querySelector('header'), document.querySelector('.body')];
+    const bgRegions = [document.querySelector('header'), document.querySelector('.body')].filter(Boolean);
 
     function openModal() {
       fUrl.value = fTitle.value = fNotes.value = fTags.value = '';
