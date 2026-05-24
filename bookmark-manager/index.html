@@ -787,6 +787,7 @@
       const title = document.createElement('div');
       title.className = 'card-title';
       title.textContent = b.title;
+      title.title = b.title;
       header.appendChild(title);
 
       const domain = extractDomain(b.url);
@@ -803,6 +804,7 @@
       url.target = '_blank';
       url.rel = 'noopener noreferrer';
       url.textContent = b.url;
+      url.title = b.url;
 
       const footer = document.createElement('div');
       footer.className = 'card-footer';
