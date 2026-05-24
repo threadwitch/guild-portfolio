@@ -793,7 +793,7 @@
 
     function animateSwap(card) {
       card.classList.remove('card--swap');
-      void card.offsetWidth;
+      void card.offsetWidth; // force reflow so the browser registers the class removal before re-adding it
       card.classList.add('card--swap');
     }
 
