@@ -384,3 +384,36 @@ This is a statement that issues remain, when the known issues were fixed, and th
 **Validity:** Not Valid
 **Priority:** N/A
 **Reasoning:** This is semantic games, but also, I want to preserve the state that we were aware of in the past, rather than revise it in light of finding continuations in the next pass.
+
+---
+
+## Review 2 — Remediation
+
+All 13 valid issues from Review 2 were resolved in a single session. Issues 10, 15, 16, and 17 were marked not valid and left as-is.
+
+### What was fixed
+
+#### Security
+- **1.** Added a `!/^javascript:/i` guard to `normalizeBookmark`, so any `javascript:` URL injected directly into localStorage is coerced to an empty string before it can be rendered as a clickable href.
+
+#### Data integrity
+- **2.** `deleteBookmark` now loads the bookmark list, verifies the target ID exists before writing, and returns early if it doesn't. A silent `load()` failure (returning `[]`) no longer causes a wipe of all stored data.
+
+#### Functional bugs
+- **3.** Moved the modal-open guard in the document `keydown` handler to before the `closeModal()` call. Pressing Escape during inline edit no longer hijacks focus to the Add Bookmark button.
+- **5.** `formatDate` now checks `isNaN(d)` after constructing the Date object instead of relying on a `try/catch` that never fires. Invalid date strings return `''` instead of `NaN-NaN-NaN`.
+- **7.** Extracted a shared `applySearch` function and passed the search-filtered bookmark set to `renderSidebar`, so tag counts in the sidebar now reflect the active search query rather than the full unfiltered set.
+- **8.** Replaced the redundant regex in `isValidUrl` with `u.host !== ''`, which rejects empty-authority URLs (e.g. `https:///`) using the already-parsed URL object. Added a comment explaining the check.
+
+#### UX
+- **4.** Notes are now displayed with a CSS 3-line clamp instead of a single truncated line. A "Show more / Show less" toggle button appears (via `requestAnimationFrame` measurement after DOM insertion) when the content actually overflows, giving full access to long notes without opening the edit form.
+- **6.** After confirming a delete, focus moves to the first remaining card's first button, or to the Add Bookmark button if the list is now empty.
+- **9.** Added `title` tooltip attributes to the card title element and URL anchor, so hovering reveals the full text when it is truncated.
+
+#### Accessibility
+- **11.** Added `.filter(Boolean)` to the `bgRegions` array to guard against `null` returns from `document.querySelector`, preventing potential TypeErrors.
+- **12.** Added a visually hidden `#sr-announce` live region (`aria-live="polite"`) to the page. `enterEditMode` sets its text to announce the edit, and `fillCard` clears it when the card reverts to view mode.
+
+#### Code quality
+- **13.** Added an inline comment to the `void card.offsetWidth` reflow trick in `animateSwap` explaining why the property read is intentional.
+- **14.** Replaced the lone `emptyHint.innerHTML` assignment with DOM methods (`createElement` / `append`), making it consistent with all other DOM writes in the file.
