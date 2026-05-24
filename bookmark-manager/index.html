@@ -1091,8 +1091,8 @@
     function isValidUrl(str) {
       try {
         const u = new URL(str);
-        return (u.protocol === 'http:' || u.protocol === 'https:') &&
-               /^https?:\/\/[^/]/.test(str);
+        // u.host check rejects URLs with empty authority (e.g. https:///)
+        return (u.protocol === 'http:' || u.protocol === 'https:') && u.host !== '';
       } catch { return false; }
     }
 
