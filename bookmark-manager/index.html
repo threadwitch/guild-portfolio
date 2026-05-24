@@ -687,9 +687,20 @@
       return raw.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
     }
 
+    function applySearch(bookmarks) {
+      const q = searchQuery.trim().toLowerCase();
+      if (!q) return bookmarks;
+      return bookmarks.filter(b =>
+        b.title.toLowerCase().includes(q) ||
+        b.url.toLowerCase().includes(q) ||
+        b.notes.toLowerCase().includes(q) ||
+        b.tags.some(t => t.includes(q))
+      );
+    }
+
     function renderAll() {
       const bookmarks = load();
-      renderSidebar(bookmarks);
+      renderSidebar(applySearch(bookmarks));
       renderBookmarks(bookmarks);
     }
 
@@ -737,15 +748,8 @@
         filtered = filtered.filter(b => b.tags.includes(activeTag));
       }
 
+      filtered = applySearch(filtered);
       const q = searchQuery.trim().toLowerCase();
-      if (q) {
-        filtered = filtered.filter(b =>
-          b.title.toLowerCase().includes(q) ||
-          b.url.toLowerCase().includes(q) ||
-          b.notes.toLowerCase().includes(q) ||
-          b.tags.some(t => t.includes(q))
-        );
-      }
 
       const empty = document.getElementById('empty-state');
       const list = document.getElementById('bookmark-list');
