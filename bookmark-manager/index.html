@@ -261,11 +261,30 @@
     .card-notes {
       font-size: 12px;
       color: var(--text-muted);
-      margin-bottom: 10px;
-      white-space: nowrap;
+      margin-bottom: 4px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
       overflow: hidden;
-      text-overflow: ellipsis;
     }
+    .card-notes.expanded {
+      display: block;
+      overflow: visible;
+    }
+
+    .notes-toggle {
+      background: none;
+      border: none;
+      font-size: 11px;
+      font-family: inherit;
+      color: var(--accent);
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .notes-toggle:hover { text-decoration: underline; }
 
     .card-footer {
       display: flex;
@@ -848,10 +867,24 @@
       }
 
       if (b.notes) {
-        const notes = document.createElement('div');
-        notes.className = 'card-notes';
-        notes.textContent = b.notes;
-        card.appendChild(notes);
+        const notesEl = document.createElement('div');
+        notesEl.className = 'card-notes';
+        notesEl.textContent = b.notes;
+        card.appendChild(notesEl);
+
+        const toggle = document.createElement('button');
+        toggle.className = 'notes-toggle';
+        toggle.style.display = 'none';
+        toggle.textContent = 'Show more';
+        toggle.addEventListener('click', () => {
+          const expanded = notesEl.classList.toggle('expanded');
+          toggle.textContent = expanded ? 'Show less' : 'Show more';
+        });
+        card.appendChild(toggle);
+
+        requestAnimationFrame(() => {
+          if (notesEl.scrollHeight > notesEl.clientHeight) toggle.style.display = '';
+        });
       }
 
       card.appendChild(footer);
