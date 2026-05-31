@@ -1,1 +1,99 @@
-[]
+[
+  {
+    "id": 1,
+    "title": "Validate tracker features.",
+    "description": null,
+    "status": "done",
+    "priority": "medium",
+    "labels": [
+      "review"
+    ],
+    "created_at": "2026-05-31T21:25:49.869233689Z"
+  },
+  {
+    "id": 2,
+    "title": "test",
+    "description": null,
+    "status": "closed",
+    "priority": "high",
+    "labels": [],
+    "created_at": "2026-05-31T21:29:47.584628693Z"
+  },
+  {
+    "id": 3,
+    "title": "Add support for multiple status and priority filters, like labels.",
+    "description": null,
+    "status": "open",
+    "priority": "medium",
+    "labels": [
+      "feature"
+    ],
+    "created_at": "2026-05-31T21:33:18.218646149Z"
+  },
+  {
+    "id": 4,
+    "title": "Give short aliases for the flags, i.e. `-p --priority`, etc.",
+    "description": null,
+    "status": "open",
+    "priority": "high",
+    "labels": [
+      "feature"
+    ],
+    "created_at": "2026-05-31T21:35:29.108291868Z"
+  },
+  {
+    "id": 5,
+    "title": "Add support for `--label-append` and `--label-remove` commands to append labels or remove them completely.",
+    "description": null,
+    "status": "open",
+    "priority": "low",
+    "labels": [
+      "feature"
+    ],
+    "created_at": "2026-05-31T21:37:43.515367725Z"
+  },
+  {
+    "id": 6,
+    "title": "Sort the issues with a status of `done` to the bottom of their priority bracket by default.`",
+    "description": null,
+    "status": "open",
+    "priority": "medium",
+    "labels": [
+      "fix"
+    ],
+    "created_at": "2026-05-31T21:40:21.356381352Z"
+  },
+  {
+    "id": 7,
+    "title": "Only show issues with status `open` and `in-progress` in the default list. Exclude `done` and `closed`. If any other filter is applied that is *not* status, it should show all matches except for `closed`. `closed` is a special case. Filtering by label, or priority should return all `open`,`in-progress`, and `done` items that match.",
+    "description": null,
+    "status": "open",
+    "priority": "high",
+    "labels": [
+      "feature"
+    ],
+    "created_at": "2026-05-31T21:45:07.327048246Z"
+  },
+  {
+    "id": 8,
+    "title": "Long issue titles should wrap in the column, or we can add a description field only visible on `tracker show <id>` and an indicator in the list view.",
+    "description": null,
+    "status": "open",
+    "priority": "low",
+    "labels": [
+      "feature"
+    ],
+    "created_at": "2026-05-31T21:46:58.512732574Z"
+  },
+  {
+    "id": 9,
+    "title": "Status should be progressive/validated. Right now, it's set to `open` on create, but update might allow it to be set to arbitrary values.",
+    "description": null,
+    "status": "open",
+    "priority": "high",
+    "labels": [
+      "feature"
+    ],
+    "created_at": "2026-05-31T21:48:51.172940504Z"
+  }
+]
