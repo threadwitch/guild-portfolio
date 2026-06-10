@@ -49,6 +49,11 @@ enum Command {
         /// Issue ID
         id: u32,
     },
+    /// Close an issue (sets status to closed; keeps the record)
+    Close {
+        /// Issue ID
+        id: u32,
+    },
     /// Update fields on an issue
     Update {
         /// Issue ID
@@ -73,6 +78,7 @@ fn main() {
         Command::List { status, priority, label } => cmd_list(status, priority, label),
         Command::Show { id } => cmd_show(id),
         Command::Delete { id } => cmd_delete(id),
+        Command::Close { id } => cmd_close(id),
         Command::Update { id, status, priority, label } => cmd_update(id, status, priority, label),
     };
     if let Err(e) = result {
@@ -119,7 +125,7 @@ fn cmd_init() -> Result<()> {
         anyhow::bail!("tracker already initialized in this directory");
     }
     std::fs::create_dir_all(&dir)?;
-    data::save_issues(&[])?;
+    data::save_store(&data::Store { next_id: 1, issues: vec![] })?;
     println!("{}", format!("Initialized tracker in {}", dir.display()).green());
     Ok(())
 }
@@ -130,8 +136,8 @@ fn cmd_create(title: String, priority: data::Priority, labels: Vec<String>) -> R
         anyhow::bail!("title cannot be empty");
     }
     let labels = normalize_labels(labels)?;
-    let mut issues = data::load_issues()?;
-    let id = issues.iter().map(|i| i.id).max().unwrap_or(0) + 1;
+    let mut store = data::load_store()?;
+    let id = store.next_id;
     let issue = data::Issue {
         id,
         title: title.clone(),
@@ -141,15 +147,16 @@ fn cmd_create(title: String, priority: data::Priority, labels: Vec<String>) -> R
         labels,
         created_at: chrono::Utc::now(),
     };
-    issues.push(issue);
-    data::save_issues(&issues)?;
+    store.issues.push(issue);
+    store.next_id += 1;
+    data::save_store(&store)?;
     println!("{}", format!("Created issue #{id}: {title}").green());
     Ok(())
 }
 
 fn cmd_show(id: u32) -> Result<()> {
-    let issues = data::load_issues()?;
-    let issue = issues
+    let store = data::load_store()?;
+    let issue = store.issues
         .iter()
         .find(|i| i.id == id)
         .ok_or_else(|| anyhow::anyhow!("no issue with id #{id}"))?;
@@ -179,25 +186,41 @@ fn cmd_show(id: u32) -> Result<()> {
 }
 
 fn cmd_delete(id: u32) -> Result<()> {
-    let mut issues = data::load_issues()?;
-    let pos = issues
+    let mut store = data::load_store()?;
+    let pos = store.issues
         .iter()
         .position(|i| i.id == id)
         .ok_or_else(|| anyhow::anyhow!("no issue with id #{id}"))?;
 
-    print!("Delete issue #{id} \"{}\"? [y/N] ", issues[pos].title);
+    println!(
+        "{}",
+        "Delete removes the issue permanently. To retire it while keeping the record, use `tracker close` instead.".dimmed()
+    );
+    print!("Delete issue #{id} \"{}\"? [y/N] ", store.issues[pos].title);
     std::io::stdout().flush()?;
 
     let mut input = String::new();
     std::io::stdin().read_line(&mut input)?;
 
     if input.trim().eq_ignore_ascii_case("y") || input.trim().eq_ignore_ascii_case("yes") {
-        issues.remove(pos);
-        data::save_issues(&issues)?;
+        store.issues.remove(pos);
+        data::save_store(&store)?;
         println!("{}", format!("Deleted issue #{id}").green());
     } else {
         println!("{}", "Aborted".dimmed());
     }
+    Ok(())
+}
+
+fn cmd_close(id: u32) -> Result<()> {
+    let mut store = data::load_store()?;
+    let issue = store.issues
+        .iter_mut()
+        .find(|i| i.id == id)
+        .ok_or_else(|| anyhow::anyhow!("no issue with id #{id}"))?;
+    issue.status = data::Status::Closed;
+    data::save_store(&store)?;
+    println!("{}", format!("Closed issue #{id}").green());
     Ok(())
 }
 
@@ -206,8 +229,8 @@ fn cmd_update(id: u32, status: Option<data::Status>, priority: Option<data::Prio
         anyhow::bail!("at least one option required (--status, --priority, --label)");
     }
     let labels = if labels.is_empty() { None } else { Some(normalize_labels(labels)?) };
-    let mut issues = data::load_issues()?;
-    let issue = issues
+    let mut store = data::load_store()?;
+    let issue = store.issues
         .iter_mut()
         .find(|i| i.id == id)
         .ok_or_else(|| anyhow::anyhow!("no issue with id #{id}"))?;
@@ -220,14 +243,14 @@ fn cmd_update(id: u32, status: Option<data::Status>, priority: Option<data::Prio
     if let Some(l) = labels {
         issue.labels = l;
     }
-    data::save_issues(&issues)?;
+    data::save_store(&store)?;
     println!("{}", format!("Updated issue #{id}").green());
     Ok(())
 }
 
 fn cmd_list(status_filter: Option<data::Status>, priority_filter: Option<data::Priority>, label_filter: Vec<String>) -> Result<()> {
-    let issues = data::load_issues()?;
-    let mut visible: Vec<&data::Issue> = issues
+    let store = data::load_store()?;
+    let mut visible: Vec<&data::Issue> = store.issues
         .iter()
         .filter(|i| match &status_filter {
             Some(s) => &i.status == s,

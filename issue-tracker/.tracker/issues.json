@@ -122,7 +122,7 @@
     "id": 12,
     "title": "IDs are reused after deletion.  The IDs are reused based on the highest numbered current issue, not counting deletions.  This could cause references to a deleted issue to point to a new issue instead.  I think that two things would be good here.  1. Add a counter object to track the highest issue number so far.  2. Favoring `closed` status over deletion.  I would rather actually have all the issues not be deleted for record keeping, and use the `closed` status to denote issues that will not be persued.",
     "description": null,
-    "status": "open",
+    "status": "done",
     "priority": "high",
     "labels": [
       "bug"
@@ -304,5 +304,16 @@
       "feature"
     ],
     "created_at": "2026-06-10T01:08:22.686374917Z"
+  },
+  {
+    "id": 29,
+    "title": "Piping tracker output into a closed pipe (e.g. `tracker list | head`) panics with `failed printing to stdout: Broken pipe` instead of exiting cleanly. Println macros panic on EPIPE; the CLI should treat a broken stdout pipe as a normal exit.",
+    "description": null,
+    "status": "open",
+    "priority": "low",
+    "labels": [
+      "bug"
+    ],
+    "created_at": "2026-06-10T01:48:50.349740039Z"
   }
 ]

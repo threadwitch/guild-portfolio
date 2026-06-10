@@ -70,19 +70,31 @@ pub fn issues_path() -> anyhow::Result<PathBuf> {
     Ok(tracker_dir()?.join("issues.json"))
 }
 
-pub fn load_issues() -> anyhow::Result<Vec<Issue>> {
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Store {
+    pub next_id: u32,
+    pub issues: Vec<Issue>,
+}
+
+pub fn load_store() -> anyhow::Result<Store> {
     let path = issues_path()?;
     if !path.exists() {
         anyhow::bail!("no tracker found in current directory — run `tracker init` first");
     }
-    let contents = fs::read_to_string(&path)
-        .context("could not read issues file")?;
-    serde_json::from_str(&contents)
-        .context("issues file is corrupt — the JSON is invalid or has an unexpected structure")
+    let contents = fs::read_to_string(&path).context("could not read issues file")?;
+    // Current format: a { next_id, issues } object. Fall back to the legacy
+    // bare array and synthesize the counter from the highest existing id.
+    if let Ok(store) = serde_json::from_str::<Store>(&contents) {
+        return Ok(store);
+    }
+    let issues: Vec<Issue> = serde_json::from_str(&contents)
+        .context("issues file is corrupt — the JSON is invalid or has an unexpected structure")?;
+    let next_id = issues.iter().map(|i| i.id).max().unwrap_or(0) + 1;
+    Ok(Store { next_id, issues })
 }
 
-pub fn save_issues(issues: &[Issue]) -> anyhow::Result<()> {
-    let contents = serde_json::to_string_pretty(issues)?;
+pub fn save_store(store: &Store) -> anyhow::Result<()> {
+    let contents = serde_json::to_string_pretty(store)?;
     let path = issues_path()?;
     let tmp = path.with_extension("json.tmp");
     fs::write(&tmp, contents).context("could not write issues file")?;
