@@ -12,3 +12,8 @@ Once I was finished creating the tracker, I figured out how to install it and ra
 
 ## Issues and Review
 At this point, I'll be storing the issues in the tracker for the duration of the build and documenting thought process here, primarily.  I'll fill in my experience, and keep the issues in that location.  
+
+### Review 1 Notes
+There are a number of issues with the command interface. Either missing features like not being able to set a description at all, or edit a title.  Other issues inclued a lack of `label` normalizing, and `priority` accepting arbitrary strings, while needing to sort by that value.  As a result, I'm wondering if some of those could be simplified with a config file?  I think there's also something to be said for the ergonomics of giving shorter commands too, especially for status moves. The issue would be that those commands would change if the status options changed, so maybe that's best left to shell aliases?  I think the first step would be to hardcode the statuses, and step through them in order to handle the process of moving through the states in the project?
+
+There's a lot of ergonomics and workflow questions here.  I'll probably need another planning session to sort this out.  I'm also considering a pre-loaded list of labels, set in the config, defaulting to semver.  This _could_ have an interactive entry mode for a TUI, and also live filtering and sorting, but I think that's probably an overbuild for a basic assignment that won't be actively used.  

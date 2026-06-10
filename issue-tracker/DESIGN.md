@@ -51,5 +51,5 @@ Notes:
 3. **Priority:** Add priority levels. Sort the list by priority. Show priority in the output with color or markers.
 4. **Labels:** Add labels to issues. Display them in the list. Filter with `tracker list --label` bug.
 5. **Compound filtering:** Make status, priority, and label filters work together. `tracker list --status open --priority high --label bug` shows high-priority open bugs. Waiting until the data structure is fleshed out should lead to less refactoring for the filter code.
-6. **Detail and delete:** `tracker show <id> shows full details including description and timestamps. `tracker delete <id>` with confirmation.
+6. **Detail and delete:** `tracker show <id>` shows full details including description and timestamps. `tracker delete <id>` with confirmation.
 7. **Polish:** Helpful error messages, colored output other than priority, a `--help` flag that explains every command, empty-state messages ("No open issues. Nice work!").
