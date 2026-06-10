@@ -446,15 +446,78 @@ fn cmd_list(status_filter: Vec<data::Status>, priority_filter: Vec<data::Priorit
         .map(|p| p.to_string().len())
         .max()
         .unwrap_or(0);
+    // When stdout is a terminal, truncate long titles to fit its width.
+    // When piped (None), leave titles full so scripts get complete data.
+    let term_width = terminal_size::terminal_size().map(|(w, _)| w.0 as usize);
     for issue in visible {
         let status = status_colored(&issue.status, status_width);
         let priority = priority_colored(&issue.priority, priority_width);
-        let labels = if issue.labels.is_empty() {
+        let labels_plain = if issue.labels.is_empty() {
             String::new()
         } else {
-            format!(" [{}]", issue.labels.join(", ")).dimmed().to_string()
+            format!(" [{}]", issue.labels.join(", "))
         };
-        println!("#{:<4} {} {} {}{}", issue.id, status, priority, issue.title, labels);
+        let labels = if labels_plain.is_empty() {
+            String::new()
+        } else {
+            labels_plain.dimmed().to_string()
+        };
+        let title = match term_width {
+            Some(w) => {
+                let id_w = issue.id.to_string().len().max(4);
+                let prefix_w = 1 + id_w + 1 + status_width + 1 + priority_width + 1;
+                truncate_title(&issue.title, prefix_w + labels_plain.chars().count(), w)
+            }
+            None => issue.title.clone(),
+        };
+        println!("#{:<4} {} {} {}{}", issue.id, status, priority, title, labels);
     }
     Ok(())
+}
+
+/// Truncate `title` with an ellipsis so it fits the remaining columns.
+/// `used` is the display width consumed by everything else on the row.
+fn truncate_title(title: &str, used: usize, term_width: usize) -> String {
+    let avail = term_width.saturating_sub(used);
+    if title.chars().count() <= avail {
+        return title.to_string();
+    }
+    if avail == 0 {
+        return String::new();
+    }
+    let mut s: String = title.chars().take(avail - 1).collect(); // reserve 1 col for …
+    s.push('…');
+    s
+}
+
+#[cfg(test)]
+mod tests {
+    use super::truncate_title;
+
+    #[test]
+    fn title_shorter_than_avail_is_unchanged() {
+        assert_eq!(truncate_title("hello", 0, 100), "hello");
+    }
+
+    #[test]
+    fn title_exactly_fits_is_unchanged() {
+        assert_eq!(truncate_title("abc", 0, 3), "abc");
+    }
+
+    #[test]
+    fn long_title_is_truncated_with_ellipsis() {
+        // avail = 8, reserve 1 for the ellipsis -> 7 chars + …
+        assert_eq!(truncate_title("hello world", 0, 8), "hello w…");
+    }
+
+    #[test]
+    fn used_columns_reduce_available_width() {
+        // used = 5, term = 8 -> avail = 3 -> 2 chars + …
+        assert_eq!(truncate_title("abcdef", 5, 8), "ab…");
+    }
+
+    #[test]
+    fn zero_available_yields_empty() {
+        assert_eq!(truncate_title("abc", 10, 5), "");
+    }
 }
