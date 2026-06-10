@@ -201,17 +201,19 @@ fn cmd_show(id: u32) -> Result<()> {
     };
     let created = issue.created_at.format("%Y-%m-%d %H:%M UTC").to_string();
 
+    // Align all values past the widest label.
+    let w = "Description:".len();
     println!("{}", format!("#{} {}", issue.id, issue.title).bold());
-    println!("Status:   {}", status_colored(&issue.status, 0));
-    println!("Priority: {}", priority);
-    println!("Labels:   {}", labels);
+    println!("{:<w$} {}", "Status:", status_colored(&issue.status, 0));
+    println!("{:<w$} {}", "Priority:", priority);
+    println!("{:<w$} {}", "Labels:", labels);
     if let Some(desc) = &issue.description {
-        println!("Desc:     {}", desc);
+        println!("{:<w$} {}", "Description:", desc);
     }
-    println!("Created:  {}", created.dimmed());
+    println!("{:<w$} {}", "Created:", created.dimmed());
     if let Some(updated) = issue.updated_at {
         let updated = updated.format("%Y-%m-%d %H:%M UTC").to_string();
-        println!("Updated:  {}", updated.dimmed());
+        println!("{:<w$} {}", "Updated:", updated.dimmed());
     }
     Ok(())
 }

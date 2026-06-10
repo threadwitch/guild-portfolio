@@ -267,12 +267,13 @@
       "id": 25,
       "title": "`cmd_show` label is `Desc:` (truncated) which is inconsistent with the field name.  It's also the only field that's truncated.  I would prefer in not truncated.",
       "description": null,
-      "status": "open",
+      "status": "done",
       "priority": "low",
       "labels": [
         "bug"
       ],
-      "created_at": "2026-06-10T01:04:15.702841868Z"
+      "created_at": "2026-06-10T01:04:15.702841868Z",
+      "updated_at": "2026-06-10T06:25:22.535722034Z"
     },
     {
       "id": 26,

@@ -179,7 +179,7 @@ fn description_set_and_clear() {
         .args(["show", "1"])
         .assert()
         .success()
-        .stdout(predicate::str::contains("hello"));
+        .stdout(predicate::str::contains("Description: hello"));
     tracker(&dir).args(["update", "1", "--description", ""]).assert().success();
     tracker(&dir)
         .args(["show", "1"])
