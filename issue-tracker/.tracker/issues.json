@@ -300,7 +300,7 @@
       "id": 28,
       "title": "There are no tests.  We should use Rust's built in test harness.",
       "description": null,
-      "status": "open",
+      "status": "done",
       "priority": "low",
       "labels": [
         "feature"
