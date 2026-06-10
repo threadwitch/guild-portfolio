@@ -216,6 +216,23 @@ fn edit_without_editor_errors() {
 }
 
 #[test]
+fn finds_tracker_from_subdirectory() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "root issue"]).assert().success();
+    let sub = dir.path().join("a/b");
+    std::fs::create_dir_all(&sub).unwrap();
+    // Run from the nested subdir; it should walk up to the parent `.tracker`.
+    Command::cargo_bin("tracker")
+        .unwrap()
+        .current_dir(&sub)
+        .env("NO_COLOR", "1")
+        .arg("list")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("root issue"));
+}
+
+#[test]
 fn commands_require_init() {
     let dir = tempfile::tempdir().unwrap();
     Command::cargo_bin("tracker")

@@ -82,8 +82,21 @@ pub fn tracker_dir() -> anyhow::Result<PathBuf> {
         .join(".tracker"))
 }
 
+/// Locate an existing `.tracker` by walking up from the current directory,
+/// so commands work from any subdirectory of a project (like git).
+fn find_tracker_dir() -> anyhow::Result<PathBuf> {
+    let start = std::env::current_dir().context("could not determine current directory")?;
+    for dir in start.ancestors() {
+        let candidate = dir.join(".tracker");
+        if candidate.is_dir() {
+            return Ok(candidate);
+        }
+    }
+    anyhow::bail!("no tracker found in this directory or any parent — run `tracker init` first");
+}
+
 pub fn issues_path() -> anyhow::Result<PathBuf> {
-    Ok(tracker_dir()?.join("issues.json"))
+    Ok(find_tracker_dir()?.join("issues.json"))
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -95,7 +108,7 @@ pub struct Store {
 pub fn load_store() -> anyhow::Result<Store> {
     let path = issues_path()?;
     if !path.exists() {
-        anyhow::bail!("no tracker found in current directory — run `tracker init` first");
+        anyhow::bail!("tracker is initialized but its issues file is missing");
     }
     let contents = fs::read_to_string(&path).context("could not read issues file")?;
     parse_store(&contents)

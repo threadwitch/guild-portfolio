@@ -245,7 +245,7 @@
       "id": 23,
       "title": "The tracker does not search parent directory, only the current directory.  Other project scoped tools walk up the directory structure to find the root, and tracker should do that too.",
       "description": null,
-      "status": "open",
+      "status": "done",
       "priority": "medium",
       "labels": [
         "bug"
