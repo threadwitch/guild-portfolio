@@ -69,7 +69,7 @@
       "id": 7,
       "title": "Only show issues with status `open` and `in-progress` in the default list. Exclude `done` and `closed`. If any other filter is applied that is *not* status, it should show all matches except for `closed`. `closed` is a special case. Filtering by label, or priority should return all `open`,`in-progress`, and `done` items that match.",
       "description": null,
-      "status": "open",
+      "status": "done",
       "priority": "high",
       "labels": [
         "feature"

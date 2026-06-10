@@ -306,11 +306,16 @@ fn cmd_update(id: u32, description: Option<String>, status: Option<data::Status>
 
 fn cmd_list(status_filter: Option<data::Status>, priority_filter: Option<data::Priority>, label_filter: Vec<String>) -> Result<()> {
     let store = data::load_store()?;
+    let has_other_filter = priority_filter.is_some() || !label_filter.is_empty();
     let mut visible: Vec<&data::Issue> = store.issues
         .iter()
         .filter(|i| match &status_filter {
+            // Explicit --status shows exactly that status (closed included).
             Some(s) => &i.status == s,
-            None => i.status != data::Status::Closed,
+            // A non-status filter widens to everything but closed.
+            None if has_other_filter => i.status != data::Status::Closed,
+            // No filters at all: only active work.
+            None => matches!(i.status, data::Status::Open | data::Status::InProgress),
         })
         .filter(|i| priority_filter.as_ref().map_or(true, |p| &i.priority == p))
         .filter(|i| {
