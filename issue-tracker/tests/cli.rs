@@ -254,6 +254,19 @@ fn finds_tracker_from_subdirectory() {
 }
 
 #[test]
+fn updated_at_is_recorded_and_shown() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "x"]).assert().success();
+    let json = std::fs::read_to_string(dir.path().join(".tracker/issues.json")).unwrap();
+    assert!(json.contains("updated_at"));
+    tracker(&dir)
+        .args(["show", "1"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Updated:"));
+}
+
+#[test]
 fn commands_require_init() {
     let dir = tempfile::tempdir().unwrap();
     Command::cargo_bin("tracker")

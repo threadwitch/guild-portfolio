@@ -74,6 +74,15 @@ pub struct Issue {
     pub priority: Priority,
     pub labels: Vec<String>,
     pub created_at: DateTime<Utc>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<DateTime<Utc>>,
+}
+
+impl Issue {
+    /// Record that the issue was just modified.
+    pub fn touch(&mut self) {
+        self.updated_at = Some(Utc::now());
+    }
 }
 
 pub fn tracker_dir() -> anyhow::Result<PathBuf> {
@@ -185,5 +194,12 @@ mod tests {
     #[test]
     fn corrupt_json_errors() {
         assert!(parse_store("not json").is_err());
+    }
+
+    #[test]
+    fn legacy_issue_without_updated_at_loads_as_none() {
+        let json = r#"[{"id":1,"title":"a","description":null,"status":"open","priority":"low","labels":[],"created_at":"2026-01-01T00:00:00Z"}]"#;
+        let store = parse_store(json).unwrap();
+        assert!(store.issues[0].updated_at.is_none());
     }
 }

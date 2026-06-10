@@ -163,6 +163,7 @@ fn cmd_create(title: String, description: Option<String>, priority: data::Priori
     let labels = normalize_labels(labels)?;
     let mut store = data::load_store()?;
     let id = store.next_id;
+    let now = chrono::Utc::now();
     let issue = data::Issue {
         id,
         title: title.clone(),
@@ -170,7 +171,8 @@ fn cmd_create(title: String, description: Option<String>, priority: data::Priori
         status: data::Status::Open,
         priority,
         labels,
-        created_at: chrono::Utc::now(),
+        created_at: now,
+        updated_at: Some(now),
     };
     store.issues.push(issue);
     store.next_id += 1;
@@ -207,6 +209,10 @@ fn cmd_show(id: u32) -> Result<()> {
         println!("Desc:     {}", desc);
     }
     println!("Created:  {}", created.dimmed());
+    if let Some(updated) = issue.updated_at {
+        let updated = updated.format("%Y-%m-%d %H:%M UTC").to_string();
+        println!("Updated:  {}", updated.dimmed());
+    }
     Ok(())
 }
 
@@ -245,6 +251,7 @@ fn cmd_close(id: u32) -> Result<()> {
         .find(|i| i.id == id)
         .ok_or_else(|| anyhow::anyhow!("no issue with id #{id}"))?;
     issue.status = data::Status::Closed;
+    issue.touch();
     data::save_store(&store)?;
     println!("{}", format!("Closed issue #{id}").green());
     Ok(())
@@ -284,6 +291,7 @@ fn cmd_edit(id: u32) -> Result<()> {
 
     let trimmed = edited.trim();
     store.issues[pos].description = if trimmed.is_empty() { None } else { Some(trimmed.to_string()) };
+    store.issues[pos].touch();
     data::save_store(&store)?;
     println!("{}", format!("Updated description for issue #{id}").green());
     Ok(())
@@ -340,6 +348,7 @@ fn cmd_update(id: u32, title: Option<String>, description: Option<String>, statu
     } else if !labels.is_empty() {
         issue.labels = normalize_labels(labels)?;
     }
+    issue.touch();
     data::save_store(&store)?;
     println!("{}", format!("Updated issue #{id}").green());
     Ok(())
