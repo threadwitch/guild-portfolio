@@ -75,6 +75,14 @@ impl PartialOrd for Priority {
     }
 }
 
+impl std::fmt::Display for Priority {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // Source of truth is clap's ValueEnum names; `f.pad` honors `{:<width$}`.
+        let pv = self.to_possible_value().expect("Priority variants are not skipped");
+        f.pad(pv.get_name())
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Issue {
     pub id: u32,
@@ -226,5 +234,12 @@ mod tests {
         // Regression: Display must use f.pad (not write_str) so the list's
         // `{:<width$}` column alignment works.
         assert_eq!(format!("{:<6}", Status::Open), "open  ");
+    }
+
+    #[test]
+    fn priority_display_matches_value_enum_names_and_pads() {
+        assert_eq!(Priority::Critical.to_string(), "critical");
+        assert_eq!(Priority::Low.to_string(), "low");
+        assert_eq!(format!("{:<8}", Priority::High), "high    ");
     }
 }
