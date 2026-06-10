@@ -212,7 +212,7 @@
       "id": 20,
       "title": "`--label` on `update` is silently destructive and the help text doesn't warn about it.  Add a warning to the help text.",
       "description": null,
-      "status": "open",
+      "status": "done",
       "priority": "medium",
       "labels": [
         "docs"
@@ -223,7 +223,7 @@
       "id": 21,
       "title": "Add the ability to append labels, and also to clear all current labels in the update interface.",
       "description": null,
-      "status": "open",
+      "status": "done",
       "priority": "medium",
       "labels": [
         "feature"

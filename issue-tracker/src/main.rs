@@ -78,9 +78,15 @@ enum Command {
         /// New priority
         #[arg(short, long)]
         priority: Option<data::Priority>,
-        /// Replace all labels; can be repeated
-        #[arg(short, long)]
+        /// Replace ALL labels (destructive). Use --add-label to append, or --clear-labels to remove all.
+        #[arg(short, long, conflicts_with_all = ["add_label", "clear_labels"])]
         label: Vec<String>,
+        /// Append one or more labels to the existing set; can be repeated
+        #[arg(long, conflicts_with = "clear_labels")]
+        add_label: Vec<String>,
+        /// Remove all labels from the issue
+        #[arg(long)]
+        clear_labels: bool,
     },
 }
 
@@ -94,7 +100,7 @@ fn main() {
         Command::Delete { id } => cmd_delete(id),
         Command::Close { id } => cmd_close(id),
         Command::Edit { id } => cmd_edit(id),
-        Command::Update { id, title, description, status, priority, label } => cmd_update(id, title, description, status, priority, label),
+        Command::Update { id, title, description, status, priority, label, add_label, clear_labels } => cmd_update(id, title, description, status, priority, label, add_label, clear_labels),
     };
     if let Err(e) = result {
         eprintln!("{} {e}", "error:".red().bold());
@@ -279,11 +285,11 @@ fn cmd_edit(id: u32) -> Result<()> {
     Ok(())
 }
 
-fn cmd_update(id: u32, title: Option<String>, description: Option<String>, status: Option<data::Status>, priority: Option<data::Priority>, labels: Vec<String>) -> Result<()> {
-    if title.is_none() && description.is_none() && status.is_none() && priority.is_none() && labels.is_empty() {
-        anyhow::bail!("at least one option required (--title, --description, --status, --priority, --label)");
+fn cmd_update(id: u32, title: Option<String>, description: Option<String>, status: Option<data::Status>, priority: Option<data::Priority>, labels: Vec<String>, add_labels: Vec<String>, clear_labels: bool) -> Result<()> {
+    if title.is_none() && description.is_none() && status.is_none() && priority.is_none()
+        && labels.is_empty() && add_labels.is_empty() && !clear_labels {
+        anyhow::bail!("at least one option required (--title, --description, --status, --priority, --label, --add-label, --clear-labels)");
     }
-    let labels = if labels.is_empty() { None } else { Some(normalize_labels(labels)?) };
     let mut store = data::load_store()?;
     let issue = store.issues
         .iter_mut()
@@ -319,8 +325,16 @@ fn cmd_update(id: u32, title: Option<String>, description: Option<String>, statu
     if let Some(p) = priority {
         issue.priority = p;
     }
-    if let Some(l) = labels {
-        issue.labels = l;
+    if clear_labels {
+        issue.labels.clear();
+    } else if !add_labels.is_empty() {
+        for l in normalize_labels(add_labels)? {
+            if !issue.labels.contains(&l) {
+                issue.labels.push(l);
+            }
+        }
+    } else if !labels.is_empty() {
+        issue.labels = normalize_labels(labels)?;
     }
     data::save_store(&store)?;
     println!("{}", format!("Updated issue #{id}").green());

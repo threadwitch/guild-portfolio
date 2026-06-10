@@ -97,6 +97,34 @@ fn labels_are_normalized_and_filter_is_case_insensitive() {
 }
 
 #[test]
+fn label_append_and_clear() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "x", "--label", "bug"]).assert().success();
+    // Append: duplicate "bug" is skipped, "Urgent" is normalized to "urgent".
+    tracker(&dir)
+        .args(["update", "1", "--add-label", "bug", "--add-label", "Urgent"])
+        .assert()
+        .success();
+    tracker(&dir)
+        .args(["show", "1"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("bug, urgent"));
+    // Clear removes them all.
+    tracker(&dir).args(["update", "1", "--clear-labels"]).assert().success();
+    tracker(&dir)
+        .args(["show", "1"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Labels:").and(predicate::str::contains("none")));
+    // The three label modes are mutually exclusive.
+    tracker(&dir)
+        .args(["update", "1", "--label", "a", "--clear-labels"])
+        .assert()
+        .failure();
+}
+
+#[test]
 fn description_set_and_clear() {
     let dir = init_repo();
     tracker(&dir).args(["create", "x", "--description", "hello"]).assert().success();
