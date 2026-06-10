@@ -299,6 +299,21 @@ fn broken_pipe_exits_quietly() {
 }
 
 #[test]
+fn completions_generate_for_all_shells() {
+    // Completions are static; they don't need an initialized tracker.
+    let dir = tempfile::tempdir().unwrap();
+    for sh in ["bash", "zsh", "fish", "nushell"] {
+        Command::cargo_bin("tracker")
+            .unwrap()
+            .current_dir(dir.path())
+            .args(["completions", sh])
+            .assert()
+            .success()
+            .stdout(predicate::str::contains("tracker"));
+    }
+}
+
+#[test]
 fn commands_require_init() {
     let dir = tempfile::tempdir().unwrap();
     Command::cargo_bin("tracker")

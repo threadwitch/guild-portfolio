@@ -1,7 +1,7 @@
 mod data;
 
 use anyhow::{Context, Result};
-use clap::{Parser, Subcommand, ValueEnum};
+use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
 use colored::Colorize;
 use std::io::Write;
 
@@ -65,6 +65,11 @@ enum Command {
         /// Issue ID
         id: u32,
     },
+    /// Print a shell completion script (bash, zsh, fish, nushell)
+    Completions {
+        /// Shell to generate completions for
+        shell: CompletionShell,
+    },
     /// Update fields on an issue
     Update {
         /// Issue ID
@@ -93,6 +98,14 @@ enum Command {
     },
 }
 
+#[derive(Clone, ValueEnum)]
+enum CompletionShell {
+    Bash,
+    Zsh,
+    Fish,
+    Nushell,
+}
+
 fn main() {
     reset_sigpipe();
     let cli = Cli::parse();
@@ -104,6 +117,7 @@ fn main() {
         Command::Delete { id, yes } => cmd_delete(id, yes),
         Command::Close { id } => cmd_close(id),
         Command::Edit { id } => cmd_edit(id),
+        Command::Completions { shell } => cmd_completions(shell),
         Command::Update { id, title, description, status, priority, label, add_label, clear_labels } => cmd_update(id, title, description, status, priority, label, add_label, clear_labels),
     };
     if let Err(e) = result {
@@ -265,6 +279,18 @@ fn cmd_close(id: u32) -> Result<()> {
     issue.touch();
     data::save_store(&store)?;
     println!("{}", format!("Closed issue #{id}").green());
+    Ok(())
+}
+
+fn cmd_completions(shell: CompletionShell) -> Result<()> {
+    let mut cmd = Cli::command();
+    let mut out = std::io::stdout();
+    match shell {
+        CompletionShell::Bash => clap_complete::generate(clap_complete::Shell::Bash, &mut cmd, "tracker", &mut out),
+        CompletionShell::Zsh => clap_complete::generate(clap_complete::Shell::Zsh, &mut cmd, "tracker", &mut out),
+        CompletionShell::Fish => clap_complete::generate(clap_complete::Shell::Fish, &mut cmd, "tracker", &mut out),
+        CompletionShell::Nushell => clap_complete::generate(clap_complete_nushell::Nushell, &mut cmd, "tracker", &mut out),
+    }
     Ok(())
 }
 
