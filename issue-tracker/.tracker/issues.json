@@ -1,319 +1,322 @@
-[
-  {
-    "id": 1,
-    "title": "Validate tracker features.",
-    "description": null,
-    "status": "done",
-    "priority": "medium",
-    "labels": [
-      "review"
-    ],
-    "created_at": "2026-05-31T21:25:49.869233689Z"
-  },
-  {
-    "id": 2,
-    "title": "test",
-    "description": null,
-    "status": "closed",
-    "priority": "high",
-    "labels": [],
-    "created_at": "2026-05-31T21:29:47.584628693Z"
-  },
-  {
-    "id": 3,
-    "title": "Add support for multiple status and priority filters, like labels.",
-    "description": null,
-    "status": "open",
-    "priority": "medium",
-    "labels": [
-      "feature"
-    ],
-    "created_at": "2026-05-31T21:33:18.218646149Z"
-  },
-  {
-    "id": 4,
-    "title": "Give short aliases for the flags, i.e. `-p --priority`, etc.",
-    "description": null,
-    "status": "open",
-    "priority": "high",
-    "labels": [
-      "feature"
-    ],
-    "created_at": "2026-05-31T21:35:29.108291868Z"
-  },
-  {
-    "id": 5,
-    "title": "Add support for `--label-append` and `--label-remove` commands to append labels or remove them completely.",
-    "description": null,
-    "status": "closed",
-    "priority": "low",
-    "labels": [
-      "feature"
-    ],
-    "created_at": "2026-05-31T21:37:43.515367725Z"
-  },
-  {
-    "id": 6,
-    "title": "Sort the issues with a status of `done` to the bottom of their priority bracket by default.`",
-    "description": null,
-    "status": "open",
-    "priority": "medium",
-    "labels": [
-      "fix"
-    ],
-    "created_at": "2026-05-31T21:40:21.356381352Z"
-  },
-  {
-    "id": 7,
-    "title": "Only show issues with status `open` and `in-progress` in the default list. Exclude `done` and `closed`. If any other filter is applied that is *not* status, it should show all matches except for `closed`. `closed` is a special case. Filtering by label, or priority should return all `open`,`in-progress`, and `done` items that match.",
-    "description": null,
-    "status": "open",
-    "priority": "high",
-    "labels": [
-      "feature"
-    ],
-    "created_at": "2026-05-31T21:45:07.327048246Z"
-  },
-  {
-    "id": 8,
-    "title": "Long issue titles should wrap in the column, or we can add a description field only visible on `tracker show <id>` and an indicator in the list view.",
-    "description": null,
-    "status": "open",
-    "priority": "low",
-    "labels": [
-      "feature"
-    ],
-    "created_at": "2026-05-31T21:46:58.512732574Z"
-  },
-  {
-    "id": 9,
-    "title": "Status should be progressive/validated. Right now, it's set to `open` on create, but update might allow it to be set to arbitrary values.",
-    "description": null,
-    "status": "open",
-    "priority": "high",
-    "labels": [
-      "feature"
-    ],
-    "created_at": "2026-05-31T21:48:51.172940504Z"
-  },
-  {
-    "id": 10,
-    "title": "`tracker_dir()` panics instead of propagating an error. It needs error handling like the rest of the codebase.",
-    "description": null,
-    "status": "done",
-    "priority": "high",
-    "labels": [
-      "bug"
-    ],
-    "created_at": "2026-06-01T20:45:18.761549552Z"
-  },
-  {
-    "id": 11,
-    "title": "`save_issuse()` is a non-atomic write. It truncates the file and writes in place. Perferred behavior is to use a temp file and `fs::rename()`",
-    "description": null,
-    "status": "done",
-    "priority": "high",
-    "labels": [
-      "bug"
-    ],
-    "created_at": "2026-06-01T20:47:05.667124654Z"
-  },
-  {
-    "id": 12,
-    "title": "IDs are reused after deletion.  The IDs are reused based on the highest numbered current issue, not counting deletions.  This could cause references to a deleted issue to point to a new issue instead.  I think that two things would be good here.  1. Add a counter object to track the highest issue number so far.  2. Favoring `closed` status over deletion.  I would rather actually have all the issues not be deleted for record keeping, and use the `closed` status to denote issues that will not be persued.",
-    "description": null,
-    "status": "done",
-    "priority": "high",
-    "labels": [
-      "bug"
-    ],
-    "created_at": "2026-06-01T23:09:37.474256870Z"
-  },
-  {
-    "id": 13,
-    "title": "The `description` field is completeley inacessible from the CLI.  This is a signficant oversight.  There's no way to touch the description, and that's part of the data that we want.  I would also like to add the capability to open the description in a text editor, given that.",
-    "description": null,
-    "status": "open",
-    "priority": "high",
-    "labels": [
-      "feature"
-    ],
-    "created_at": "2026-06-01T23:23:28.619770961Z"
-  },
-  {
-    "id": 14,
-    "title": "Labels are not normalized to lowercase on storage, making everything case-sensitive and inconsistent.  Labels aren't sanitized and the filtering is strict, so that can cause issues of mismatch.  I would prefer to normalize on entry.",
-    "description": null,
-    "status": "done",
-    "priority": "high",
-    "labels": [
-      "bug"
-    ],
-    "created_at": "2026-06-01T23:34:33.372780518Z"
-  },
-  {
-    "id": 15,
-    "title": "`Priority`'s sort order is encoded silently in declaration order.  This is true and it assumes a fixed list of priority levels, while the flag takes any string.  Perhaps, limiting the priority levels to a set of inputs, with tab completion would work better?  Or reading a config file that declares them?",
-    "description": null,
-    "status": "closed",
-    "priority": "high",
-    "labels": [
-      "bug"
-    ],
-    "created_at": "2026-06-02T01:22:35.019707133Z"
-  },
-  {
-    "id": 16,
-    "title": "`Priority`'s sort order is encoded silently in declaration order. If anyone adds a Critical variant or rearranges the enum for any reason, the sort silently breaks. The Ord implementation for a type that has a meaningful semantic order should be explicit, not derived, or at minimum it should have a comment stating the invariant.",
-    "description": null,
-    "status": "done",
-    "priority": "high",
-    "labels": [
-      "bug"
-    ],
-    "created_at": "2026-06-10T00:14:10.609968542Z"
-  },
-  {
-    "id": 17,
-    "title": "Add `critical` priority at higher sort than `high`.",
-    "description": null,
-    "status": "done",
-    "priority": "low",
-    "labels": [
-      "feature"
-    ],
-    "created_at": "2026-06-10T00:15:12.964921644Z"
-  },
-  {
-    "id": 18,
-    "title": "Add tab completions for bash, zsh, fish, and nushell for priority levels.",
-    "description": null,
-    "status": "open",
-    "priority": "low",
-    "labels": [
-      "feature"
-    ],
-    "created_at": "2026-06-10T00:16:14.950465674Z"
-  },
-  {
-    "id": 19,
-    "title": "`--title` and `--description` are missing from `update`.",
-    "description": null,
-    "status": "open",
-    "priority": "medium",
-    "labels": [
-      "bug"
-    ],
-    "created_at": "2026-06-10T00:17:43.632993590Z"
-  },
-  {
-    "id": 20,
-    "title": "`--label` on `update` is silently destructive and the help text doesn't warn about it.  Add a warning to the help text.",
-    "description": null,
-    "status": "open",
-    "priority": "medium",
-    "labels": [
-      "docs"
-    ],
-    "created_at": "2026-06-10T00:21:40.366808801Z"
-  },
-  {
-    "id": 21,
-    "title": "Add the ability to append labels, and also to clear all current labels in the update interface.",
-    "description": null,
-    "status": "open",
-    "priority": "medium",
-    "labels": [
-      "feature"
-    ],
-    "created_at": "2026-06-10T00:23:23.935736458Z"
-  },
-  {
-    "id": 22,
-    "title": "`cmd_delete` has no `--yes`/`--force` flag for scripted use.  Add one.",
-    "description": null,
-    "status": "open",
-    "priority": "medium",
-    "labels": [
-      "bug"
-    ],
-    "created_at": "2026-06-10T00:51:37.248778725Z"
-  },
-  {
-    "id": 23,
-    "title": "The tracker does not search parent directory, only the current directory.  Other project scoped tools walk up the directory structure to find the root, and tracker should do that too.",
-    "description": null,
-    "status": "open",
-    "priority": "medium",
-    "labels": [
-      "bug"
-    ],
-    "created_at": "2026-06-10T00:55:29.292786544Z"
-  },
-  {
-    "id": 24,
-    "title": "`status_str` is redundant with the `clap::ValueEnum` derivation. `main.rs:84-91`: `status_str` manually maps each `Status` variant to a string. These strings are identical to the ones `clap` already derives from `#[serde(rename_all = snake_case)]` and `#[value(name = in-progress)]`. There are now two places to update if a variant is renamed. Remove `status_str` and implement `Display` on `Status` instead, or at minimum have `status_colored` call into the `ValueEnum` trait.",
-    "description": null,
-    "status": "open",
-    "priority": "low",
-    "labels": [
-      "refactor"
-    ],
-    "created_at": "2026-06-10T00:59:24.748398902Z"
-  },
-  {
-    "id": 25,
-    "title": "`cmd_show` label is `Desc:` (truncated) which is inconsistent with the field name.  It's also the only field that's truncated.  I would prefer in not truncated.",
-    "description": null,
-    "status": "open",
-    "priority": "low",
-    "labels": [
-      "bug"
-    ],
-    "created_at": "2026-06-10T01:04:15.702841868Z"
-  },
-  {
-    "id": 26,
-    "title": "There's no `updated_at` field, and that would be useful.",
-    "description": null,
-    "status": "open",
-    "priority": "low",
-    "labels": [
-      "feature"
-    ],
-    "created_at": "2026-06-10T01:05:07.640733053Z"
-  },
-  {
-    "id": 27,
-    "title": "The magic number `12` in `cmd_list` for status column padding is unexplained.  It's the correct size for the current `status` options, but making it dynamic to the widest status means that it will work properly with any changes to the list of `status` options in the future.",
-    "description": null,
-    "status": "open",
-    "priority": "low",
-    "labels": [
-      "refactor"
-    ],
-    "created_at": "2026-06-10T01:07:27.808491292Z"
-  },
-  {
-    "id": 28,
-    "title": "There are no tests.  We should use Rust's built in test harness.",
-    "description": null,
-    "status": "open",
-    "priority": "low",
-    "labels": [
-      "feature"
-    ],
-    "created_at": "2026-06-10T01:08:22.686374917Z"
-  },
-  {
-    "id": 29,
-    "title": "Piping tracker output into a closed pipe (e.g. `tracker list | head`) panics with `failed printing to stdout: Broken pipe` instead of exiting cleanly. Println macros panic on EPIPE; the CLI should treat a broken stdout pipe as a normal exit.",
-    "description": null,
-    "status": "open",
-    "priority": "low",
-    "labels": [
-      "bug"
-    ],
-    "created_at": "2026-06-10T01:48:50.349740039Z"
-  }
-]
+{
+  "next_id": 30,
+  "issues": [
+    {
+      "id": 1,
+      "title": "Validate tracker features.",
+      "description": null,
+      "status": "done",
+      "priority": "medium",
+      "labels": [
+        "review"
+      ],
+      "created_at": "2026-05-31T21:25:49.869233689Z"
+    },
+    {
+      "id": 2,
+      "title": "test",
+      "description": null,
+      "status": "closed",
+      "priority": "high",
+      "labels": [],
+      "created_at": "2026-05-31T21:29:47.584628693Z"
+    },
+    {
+      "id": 3,
+      "title": "Add support for multiple status and priority filters, like labels.",
+      "description": null,
+      "status": "open",
+      "priority": "medium",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-05-31T21:33:18.218646149Z"
+    },
+    {
+      "id": 4,
+      "title": "Give short aliases for the flags, i.e. `-p --priority`, etc.",
+      "description": null,
+      "status": "open",
+      "priority": "high",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-05-31T21:35:29.108291868Z"
+    },
+    {
+      "id": 5,
+      "title": "Add support for `--label-append` and `--label-remove` commands to append labels or remove them completely.",
+      "description": null,
+      "status": "closed",
+      "priority": "low",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-05-31T21:37:43.515367725Z"
+    },
+    {
+      "id": 6,
+      "title": "Sort the issues with a status of `done` to the bottom of their priority bracket by default.`",
+      "description": null,
+      "status": "open",
+      "priority": "medium",
+      "labels": [
+        "fix"
+      ],
+      "created_at": "2026-05-31T21:40:21.356381352Z"
+    },
+    {
+      "id": 7,
+      "title": "Only show issues with status `open` and `in-progress` in the default list. Exclude `done` and `closed`. If any other filter is applied that is *not* status, it should show all matches except for `closed`. `closed` is a special case. Filtering by label, or priority should return all `open`,`in-progress`, and `done` items that match.",
+      "description": null,
+      "status": "open",
+      "priority": "high",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-05-31T21:45:07.327048246Z"
+    },
+    {
+      "id": 8,
+      "title": "Long issue titles should wrap in the column, or we can add a description field only visible on `tracker show <id>` and an indicator in the list view.",
+      "description": null,
+      "status": "open",
+      "priority": "low",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-05-31T21:46:58.512732574Z"
+    },
+    {
+      "id": 9,
+      "title": "Status should be progressive/validated. Right now, it's set to `open` on create, but update might allow it to be set to arbitrary values.",
+      "description": null,
+      "status": "open",
+      "priority": "high",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-05-31T21:48:51.172940504Z"
+    },
+    {
+      "id": 10,
+      "title": "`tracker_dir()` panics instead of propagating an error. It needs error handling like the rest of the codebase.",
+      "description": null,
+      "status": "done",
+      "priority": "high",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-01T20:45:18.761549552Z"
+    },
+    {
+      "id": 11,
+      "title": "`save_issuse()` is a non-atomic write. It truncates the file and writes in place. Perferred behavior is to use a temp file and `fs::rename()`",
+      "description": null,
+      "status": "done",
+      "priority": "high",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-01T20:47:05.667124654Z"
+    },
+    {
+      "id": 12,
+      "title": "IDs are reused after deletion.  The IDs are reused based on the highest numbered current issue, not counting deletions.  This could cause references to a deleted issue to point to a new issue instead.  I think that two things would be good here.  1. Add a counter object to track the highest issue number so far.  2. Favoring `closed` status over deletion.  I would rather actually have all the issues not be deleted for record keeping, and use the `closed` status to denote issues that will not be persued.",
+      "description": null,
+      "status": "done",
+      "priority": "high",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-01T23:09:37.474256870Z"
+    },
+    {
+      "id": 13,
+      "title": "The `description` field is completeley inacessible from the CLI.  This is a signficant oversight.  There's no way to touch the description, and that's part of the data that we want.  I would also like to add the capability to open the description in a text editor, given that.",
+      "description": null,
+      "status": "done",
+      "priority": "high",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-06-01T23:23:28.619770961Z"
+    },
+    {
+      "id": 14,
+      "title": "Labels are not normalized to lowercase on storage, making everything case-sensitive and inconsistent.  Labels aren't sanitized and the filtering is strict, so that can cause issues of mismatch.  I would prefer to normalize on entry.",
+      "description": null,
+      "status": "done",
+      "priority": "high",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-01T23:34:33.372780518Z"
+    },
+    {
+      "id": 15,
+      "title": "`Priority`'s sort order is encoded silently in declaration order.  This is true and it assumes a fixed list of priority levels, while the flag takes any string.  Perhaps, limiting the priority levels to a set of inputs, with tab completion would work better?  Or reading a config file that declares them?",
+      "description": null,
+      "status": "closed",
+      "priority": "high",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-02T01:22:35.019707133Z"
+    },
+    {
+      "id": 16,
+      "title": "`Priority`'s sort order is encoded silently in declaration order. If anyone adds a Critical variant or rearranges the enum for any reason, the sort silently breaks. The Ord implementation for a type that has a meaningful semantic order should be explicit, not derived, or at minimum it should have a comment stating the invariant.",
+      "description": null,
+      "status": "done",
+      "priority": "high",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-10T00:14:10.609968542Z"
+    },
+    {
+      "id": 17,
+      "title": "Add `critical` priority at higher sort than `high`.",
+      "description": null,
+      "status": "done",
+      "priority": "low",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-06-10T00:15:12.964921644Z"
+    },
+    {
+      "id": 18,
+      "title": "Add tab completions for bash, zsh, fish, and nushell for priority levels.",
+      "description": null,
+      "status": "open",
+      "priority": "low",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-06-10T00:16:14.950465674Z"
+    },
+    {
+      "id": 19,
+      "title": "`--title` and `--description` are missing from `update`.",
+      "description": null,
+      "status": "open",
+      "priority": "medium",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-10T00:17:43.632993590Z"
+    },
+    {
+      "id": 20,
+      "title": "`--label` on `update` is silently destructive and the help text doesn't warn about it.  Add a warning to the help text.",
+      "description": null,
+      "status": "open",
+      "priority": "medium",
+      "labels": [
+        "docs"
+      ],
+      "created_at": "2026-06-10T00:21:40.366808801Z"
+    },
+    {
+      "id": 21,
+      "title": "Add the ability to append labels, and also to clear all current labels in the update interface.",
+      "description": null,
+      "status": "open",
+      "priority": "medium",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-06-10T00:23:23.935736458Z"
+    },
+    {
+      "id": 22,
+      "title": "`cmd_delete` has no `--yes`/`--force` flag for scripted use.  Add one.",
+      "description": null,
+      "status": "open",
+      "priority": "medium",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-10T00:51:37.248778725Z"
+    },
+    {
+      "id": 23,
+      "title": "The tracker does not search parent directory, only the current directory.  Other project scoped tools walk up the directory structure to find the root, and tracker should do that too.",
+      "description": null,
+      "status": "open",
+      "priority": "medium",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-10T00:55:29.292786544Z"
+    },
+    {
+      "id": 24,
+      "title": "`status_str` is redundant with the `clap::ValueEnum` derivation. `main.rs:84-91`: `status_str` manually maps each `Status` variant to a string. These strings are identical to the ones `clap` already derives from `#[serde(rename_all = snake_case)]` and `#[value(name = in-progress)]`. There are now two places to update if a variant is renamed. Remove `status_str` and implement `Display` on `Status` instead, or at minimum have `status_colored` call into the `ValueEnum` trait.",
+      "description": null,
+      "status": "open",
+      "priority": "low",
+      "labels": [
+        "refactor"
+      ],
+      "created_at": "2026-06-10T00:59:24.748398902Z"
+    },
+    {
+      "id": 25,
+      "title": "`cmd_show` label is `Desc:` (truncated) which is inconsistent with the field name.  It's also the only field that's truncated.  I would prefer in not truncated.",
+      "description": null,
+      "status": "open",
+      "priority": "low",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-10T01:04:15.702841868Z"
+    },
+    {
+      "id": 26,
+      "title": "There's no `updated_at` field, and that would be useful.",
+      "description": null,
+      "status": "open",
+      "priority": "low",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-06-10T01:05:07.640733053Z"
+    },
+    {
+      "id": 27,
+      "title": "The magic number `12` in `cmd_list` for status column padding is unexplained.  It's the correct size for the current `status` options, but making it dynamic to the widest status means that it will work properly with any changes to the list of `status` options in the future.",
+      "description": null,
+      "status": "open",
+      "priority": "low",
+      "labels": [
+        "refactor"
+      ],
+      "created_at": "2026-06-10T01:07:27.808491292Z"
+    },
+    {
+      "id": 28,
+      "title": "There are no tests.  We should use Rust's built in test harness.",
+      "description": null,
+      "status": "open",
+      "priority": "low",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-06-10T01:08:22.686374917Z"
+    },
+    {
+      "id": 29,
+      "title": "Piping tracker output into a closed pipe (e.g. `tracker list | head`) panics with `failed printing to stdout: Broken pipe` instead of exiting cleanly. Println macros panic on EPIPE; the CLI should treat a broken stdout pipe as a normal exit.",
+      "description": null,
+      "status": "open",
+      "priority": "low",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-10T01:48:50.349740039Z"
+    }
+  ]
+}

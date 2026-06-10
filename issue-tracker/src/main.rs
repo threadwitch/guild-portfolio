@@ -1,6 +1,6 @@
 mod data;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
 use std::io::Write;
@@ -20,6 +20,9 @@ enum Command {
     Create {
         /// Issue title
         title: String,
+        /// Issue description
+        #[arg(long)]
+        description: Option<String>,
         /// Priority level
         #[arg(long, default_value = "medium")]
         priority: data::Priority,
@@ -54,10 +57,18 @@ enum Command {
         /// Issue ID
         id: u32,
     },
+    /// Edit an issue's description in $EDITOR
+    Edit {
+        /// Issue ID
+        id: u32,
+    },
     /// Update fields on an issue
     Update {
         /// Issue ID
         id: u32,
+        /// New description (pass "" to clear)
+        #[arg(long)]
+        description: Option<String>,
         /// New status
         #[arg(long)]
         status: Option<data::Status>,
@@ -74,12 +85,13 @@ fn main() {
     let cli = Cli::parse();
     let result = match cli.command {
         Command::Init => cmd_init(),
-        Command::Create { title, priority, label } => cmd_create(title, priority, label),
+        Command::Create { title, description, priority, label } => cmd_create(title, description, priority, label),
         Command::List { status, priority, label } => cmd_list(status, priority, label),
         Command::Show { id } => cmd_show(id),
         Command::Delete { id } => cmd_delete(id),
         Command::Close { id } => cmd_close(id),
-        Command::Update { id, status, priority, label } => cmd_update(id, status, priority, label),
+        Command::Edit { id } => cmd_edit(id),
+        Command::Update { id, description, status, priority, label } => cmd_update(id, description, status, priority, label),
     };
     if let Err(e) = result {
         eprintln!("{} {e}", "error:".red().bold());
@@ -130,18 +142,19 @@ fn cmd_init() -> Result<()> {
     Ok(())
 }
 
-fn cmd_create(title: String, priority: data::Priority, labels: Vec<String>) -> Result<()> {
+fn cmd_create(title: String, description: Option<String>, priority: data::Priority, labels: Vec<String>) -> Result<()> {
     let title = title.trim().to_string();
     if title.is_empty() {
         anyhow::bail!("title cannot be empty");
     }
+    let description = description.map(|d| d.trim().to_string()).filter(|d| !d.is_empty());
     let labels = normalize_labels(labels)?;
     let mut store = data::load_store()?;
     let id = store.next_id;
     let issue = data::Issue {
         id,
         title: title.clone(),
-        description: None,
+        description,
         status: data::Status::Open,
         priority,
         labels,
@@ -224,9 +237,48 @@ fn cmd_close(id: u32) -> Result<()> {
     Ok(())
 }
 
-fn cmd_update(id: u32, status: Option<data::Status>, priority: Option<data::Priority>, labels: Vec<String>) -> Result<()> {
-    if status.is_none() && priority.is_none() && labels.is_empty() {
-        anyhow::bail!("at least one option required (--status, --priority, --label)");
+fn cmd_edit(id: u32) -> Result<()> {
+    let editor = std::env::var("EDITOR")
+        .or_else(|_| std::env::var("VISUAL"))
+        .map_err(|_| anyhow::anyhow!("no editor found — set $EDITOR or $VISUAL"))?;
+
+    let mut store = data::load_store()?;
+    let pos = store.issues
+        .iter()
+        .position(|i| i.id == id)
+        .ok_or_else(|| anyhow::anyhow!("no issue with id #{id}"))?;
+
+    let temp_path = std::env::temp_dir().join(format!("tracker-edit-{id}.md"));
+    std::fs::write(&temp_path, store.issues[pos].description.as_deref().unwrap_or(""))
+        .context("could not create temp file for editing")?;
+
+    // `sh -c '<editor> "$1"' sh <path>` — passes the path as $1 so editors with
+    // their own args (e.g. `code --wait`) work and the path can't be re-split.
+    let status = std::process::Command::new("sh")
+        .arg("-c")
+        .arg(format!("{editor} \"$1\""))
+        .arg("sh")
+        .arg(&temp_path)
+        .status()
+        .context("could not launch editor")?;
+    if !status.success() {
+        let _ = std::fs::remove_file(&temp_path);
+        anyhow::bail!("editor exited with an error; description unchanged");
+    }
+
+    let edited = std::fs::read_to_string(&temp_path).context("could not read edited description")?;
+    let _ = std::fs::remove_file(&temp_path);
+
+    let trimmed = edited.trim();
+    store.issues[pos].description = if trimmed.is_empty() { None } else { Some(trimmed.to_string()) };
+    data::save_store(&store)?;
+    println!("{}", format!("Updated description for issue #{id}").green());
+    Ok(())
+}
+
+fn cmd_update(id: u32, description: Option<String>, status: Option<data::Status>, priority: Option<data::Priority>, labels: Vec<String>) -> Result<()> {
+    if description.is_none() && status.is_none() && priority.is_none() && labels.is_empty() {
+        anyhow::bail!("at least one option required (--description, --status, --priority, --label)");
     }
     let labels = if labels.is_empty() { None } else { Some(normalize_labels(labels)?) };
     let mut store = data::load_store()?;
@@ -234,6 +286,10 @@ fn cmd_update(id: u32, status: Option<data::Status>, priority: Option<data::Prio
         .iter_mut()
         .find(|i| i.id == id)
         .ok_or_else(|| anyhow::anyhow!("no issue with id #{id}"))?;
+    if let Some(d) = description {
+        let d = d.trim();
+        issue.description = if d.is_empty() { None } else { Some(d.to_string()) };
+    }
     if let Some(s) = status {
         issue.status = s;
     }
