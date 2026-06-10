@@ -114,7 +114,7 @@ fn normalize_labels(labels: Vec<String>) -> Result<Vec<String>> {
 }
 
 fn cmd_init() -> Result<()> {
-    let dir = data::tracker_dir();
+    let dir = data::tracker_dir()?;
     if dir.exists() {
         anyhow::bail!("tracker already initialized in this directory");
     }

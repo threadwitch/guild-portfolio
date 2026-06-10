@@ -33,18 +33,18 @@ pub struct Issue {
     pub created_at: DateTime<Utc>,
 }
 
-pub fn tracker_dir() -> PathBuf {
-    std::env::current_dir()
-        .expect("could not get current directory")
-        .join(".tracker")
+pub fn tracker_dir() -> anyhow::Result<PathBuf> {
+    Ok(std::env::current_dir()
+        .context("could not determine current directory")?
+        .join(".tracker"))
 }
 
-pub fn issues_path() -> PathBuf {
-    tracker_dir().join("issues.json")
+pub fn issues_path() -> anyhow::Result<PathBuf> {
+    Ok(tracker_dir()?.join("issues.json"))
 }
 
 pub fn load_issues() -> anyhow::Result<Vec<Issue>> {
-    let path = issues_path();
+    let path = issues_path()?;
     if !path.exists() {
         anyhow::bail!("no tracker found in current directory — run `tracker init` first");
     }
@@ -56,6 +56,6 @@ pub fn load_issues() -> anyhow::Result<Vec<Issue>> {
 
 pub fn save_issues(issues: &[Issue]) -> anyhow::Result<()> {
     let contents = serde_json::to_string_pretty(issues)?;
-    fs::write(issues_path(), contents).context("could not write issues file")?;
+    fs::write(issues_path()?, contents).context("could not write issues file")?;
     Ok(())
 }

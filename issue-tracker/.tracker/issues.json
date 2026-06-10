@@ -100,7 +100,7 @@
     "id": 10,
     "title": "`tracker_dir()` panics instead of propagating an error. It needs error handling like the rest of the codebase.",
     "description": null,
-    "status": "open",
+    "status": "done",
     "priority": "high",
     "labels": [
       "bug"
