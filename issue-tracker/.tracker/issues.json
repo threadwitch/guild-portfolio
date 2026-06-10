@@ -256,12 +256,13 @@
       "id": 24,
       "title": "`status_str` is redundant with the `clap::ValueEnum` derivation. `main.rs:84-91`: `status_str` manually maps each `Status` variant to a string. These strings are identical to the ones `clap` already derives from `#[serde(rename_all = snake_case)]` and `#[value(name = in-progress)]`. There are now two places to update if a variant is renamed. Remove `status_str` and implement `Display` on `Status` instead, or at minimum have `status_colored` call into the `ValueEnum` trait.",
       "description": null,
-      "status": "open",
+      "status": "done",
       "priority": "low",
       "labels": [
         "refactor"
       ],
-      "created_at": "2026-06-10T00:59:24.748398902Z"
+      "created_at": "2026-06-10T00:59:24.748398902Z",
+      "updated_at": "2026-06-10T06:30:56.271742163Z"
     },
     {
       "id": 25,
@@ -291,12 +292,13 @@
       "id": 27,
       "title": "The magic number `12` in `cmd_list` for status column padding is unexplained.  It's the correct size for the current `status` options, but making it dynamic to the widest status means that it will work properly with any changes to the list of `status` options in the future.",
       "description": null,
-      "status": "open",
+      "status": "done",
       "priority": "low",
       "labels": [
         "refactor"
       ],
-      "created_at": "2026-06-10T01:07:27.808491292Z"
+      "created_at": "2026-06-10T01:07:27.808491292Z",
+      "updated_at": "2026-06-10T06:30:56.272919063Z"
     },
     {
       "id": 28,

@@ -1,7 +1,7 @@
 mod data;
 
 use anyhow::{Context, Result};
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 use colored::Colorize;
 use std::io::Write;
 
@@ -111,17 +111,8 @@ fn main() {
     }
 }
 
-fn status_str(status: &data::Status) -> &'static str {
-    match status {
-        data::Status::Open => "open",
-        data::Status::InProgress => "in-progress",
-        data::Status::Done => "done",
-        data::Status::Closed => "closed",
-    }
-}
-
 fn status_colored(status: &data::Status, pad: usize) -> String {
-    let s = format!("{:<width$}", status_str(status), width = pad);
+    let s = format!("{:<width$}", status, width = pad);
     match status {
         data::Status::Open => s,
         data::Status::InProgress => s.cyan().to_string(),
@@ -322,16 +313,16 @@ fn cmd_update(id: u32, title: Option<String>, description: Option<String>, statu
     }
     if let Some(s) = status {
         if issue.status == s {
-            anyhow::bail!("issue #{id} is already {}", status_str(&s));
+            anyhow::bail!("issue #{id} is already {}", s);
         }
         if !issue.status.can_transition_to(&s) {
             let allowed = issue.status.allowed_next().iter()
-                .map(status_str)
+                .map(|s| s.to_string())
                 .collect::<Vec<_>>()
                 .join(", ");
             anyhow::bail!(
                 "cannot move {} -> {}; valid transitions: {}",
-                status_str(&issue.status), status_str(&s), allowed
+                issue.status, s, allowed
             );
         }
         issue.status = s;
@@ -399,8 +390,15 @@ fn cmd_list(status_filter: Vec<data::Status>, priority_filter: Vec<data::Priorit
         })
     });
 
+    // Width of the status column: the widest status name (the inter-column
+    // space in the format string below provides the gap).
+    let status_width = data::Status::value_variants()
+        .iter()
+        .map(|s| s.to_string().len())
+        .max()
+        .unwrap_or(0);
     for issue in visible {
-        let status = status_colored(&issue.status, 12);
+        let status = status_colored(&issue.status, status_width);
         let priority = match issue.priority {
             data::Priority::Critical => format!("{:<8}", "critical").red().bold().underline().to_string(),
             data::Priority::High => format!("{:<8}", "high").red().bold().to_string(),

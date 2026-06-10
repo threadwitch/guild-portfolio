@@ -1,5 +1,6 @@
 use anyhow::Context;
 use chrono::{DateTime, Utc};
+use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
@@ -27,6 +28,15 @@ impl Status {
 
     pub fn can_transition_to(&self, next: &Status) -> bool {
         self.allowed_next().contains(next)
+    }
+}
+
+impl std::fmt::Display for Status {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // Source of truth is clap's ValueEnum names (incl. the `in-progress` override).
+        // Use `f.pad` (not `write_str`) so `{:<width$}` padding is honored.
+        let pv = self.to_possible_value().expect("Status variants are not skipped");
+        f.pad(pv.get_name())
     }
 }
 
@@ -201,5 +211,20 @@ mod tests {
         let json = r#"[{"id":1,"title":"a","description":null,"status":"open","priority":"low","labels":[],"created_at":"2026-01-01T00:00:00Z"}]"#;
         let store = parse_store(json).unwrap();
         assert!(store.issues[0].updated_at.is_none());
+    }
+
+    #[test]
+    fn status_display_matches_value_enum_names() {
+        assert_eq!(Status::Open.to_string(), "open");
+        assert_eq!(Status::InProgress.to_string(), "in-progress");
+        assert_eq!(Status::Done.to_string(), "done");
+        assert_eq!(Status::Closed.to_string(), "closed");
+    }
+
+    #[test]
+    fn status_display_honors_padding() {
+        // Regression: Display must use f.pad (not write_str) so the list's
+        // `{:<width$}` column alignment works.
+        assert_eq!(format!("{:<6}", Status::Open), "open  ");
     }
 }
