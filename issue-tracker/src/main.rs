@@ -66,6 +66,9 @@ enum Command {
     Update {
         /// Issue ID
         id: u32,
+        /// New title
+        #[arg(short, long)]
+        title: Option<String>,
         /// New description (pass "" to clear)
         #[arg(short, long)]
         description: Option<String>,
@@ -91,7 +94,7 @@ fn main() {
         Command::Delete { id } => cmd_delete(id),
         Command::Close { id } => cmd_close(id),
         Command::Edit { id } => cmd_edit(id),
-        Command::Update { id, description, status, priority, label } => cmd_update(id, description, status, priority, label),
+        Command::Update { id, title, description, status, priority, label } => cmd_update(id, title, description, status, priority, label),
     };
     if let Err(e) = result {
         eprintln!("{} {e}", "error:".red().bold());
@@ -276,9 +279,9 @@ fn cmd_edit(id: u32) -> Result<()> {
     Ok(())
 }
 
-fn cmd_update(id: u32, description: Option<String>, status: Option<data::Status>, priority: Option<data::Priority>, labels: Vec<String>) -> Result<()> {
-    if description.is_none() && status.is_none() && priority.is_none() && labels.is_empty() {
-        anyhow::bail!("at least one option required (--description, --status, --priority, --label)");
+fn cmd_update(id: u32, title: Option<String>, description: Option<String>, status: Option<data::Status>, priority: Option<data::Priority>, labels: Vec<String>) -> Result<()> {
+    if title.is_none() && description.is_none() && status.is_none() && priority.is_none() && labels.is_empty() {
+        anyhow::bail!("at least one option required (--title, --description, --status, --priority, --label)");
     }
     let labels = if labels.is_empty() { None } else { Some(normalize_labels(labels)?) };
     let mut store = data::load_store()?;
@@ -286,6 +289,13 @@ fn cmd_update(id: u32, description: Option<String>, status: Option<data::Status>
         .iter_mut()
         .find(|i| i.id == id)
         .ok_or_else(|| anyhow::anyhow!("no issue with id #{id}"))?;
+    if let Some(t) = title {
+        let t = t.trim();
+        if t.is_empty() {
+            anyhow::bail!("title cannot be empty");
+        }
+        issue.title = t.to_string();
+    }
     if let Some(d) = description {
         let d = d.trim();
         issue.description = if d.is_empty() { None } else { Some(d.to_string()) };
