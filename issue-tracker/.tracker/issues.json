@@ -91,7 +91,7 @@
       "id": 9,
       "title": "Status should be progressive/validated. Right now, it's set to `open` on create, but update might allow it to be set to arbitrary values.",
       "description": null,
-      "status": "open",
+      "status": "done",
       "priority": "high",
       "labels": [
         "feature"

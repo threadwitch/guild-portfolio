@@ -14,6 +14,22 @@ pub enum Status {
     Closed,
 }
 
+impl Status {
+    /// Statuses this one may transition to (adjacent-only flow).
+    pub fn allowed_next(&self) -> &'static [Status] {
+        match self {
+            Status::Open => &[Status::InProgress, Status::Closed],
+            Status::InProgress => &[Status::Open, Status::Done, Status::Closed],
+            Status::Done => &[Status::InProgress, Status::Closed],
+            Status::Closed => &[Status::Open],
+        }
+    }
+
+    pub fn can_transition_to(&self, next: &Status) -> bool {
+        self.allowed_next().contains(next)
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, clap::ValueEnum)]
 #[serde(rename_all = "snake_case")]
 pub enum Priority {

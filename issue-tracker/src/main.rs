@@ -291,6 +291,19 @@ fn cmd_update(id: u32, description: Option<String>, status: Option<data::Status>
         issue.description = if d.is_empty() { None } else { Some(d.to_string()) };
     }
     if let Some(s) = status {
+        if issue.status == s {
+            anyhow::bail!("issue #{id} is already {}", status_str(&s));
+        }
+        if !issue.status.can_transition_to(&s) {
+            let allowed = issue.status.allowed_next().iter()
+                .map(status_str)
+                .collect::<Vec<_>>()
+                .join(", ");
+            anyhow::bail!(
+                "cannot move {} -> {}; valid transitions: {}",
+                status_str(&issue.status), status_str(&s), allowed
+            );
+        }
         issue.status = s;
     }
     if let Some(p) = priority {
