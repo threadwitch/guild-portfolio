@@ -267,6 +267,38 @@ fn updated_at_is_recorded_and_shown() {
 }
 
 #[test]
+fn broken_pipe_exits_quietly() {
+    let dir = init_repo();
+    // Seed many issues directly (legacy array format is accepted) so the list
+    // output overflows the pipe buffer and a closing reader reliably hits EPIPE.
+    let mut json = String::from("[");
+    for i in 1..=2000 {
+        if i > 1 {
+            json.push(',');
+        }
+        json.push_str(&format!(
+            r#"{{"id":{i},"title":"issue number {i} with a bit of extra padding text","description":null,"status":"open","priority":"medium","labels":[],"created_at":"2026-01-01T00:00:00Z"}}"#
+        ));
+    }
+    json.push(']');
+    std::fs::write(dir.path().join(".tracker/issues.json"), json).unwrap();
+
+    let output = std::process::Command::new("sh")
+        .arg("-c")
+        .arg("\"$BIN\" list | head -1")
+        .env("BIN", env!("CARGO_BIN_EXE_tracker"))
+        .env("NO_COLOR", "1")
+        .current_dir(dir.path())
+        .output()
+        .unwrap();
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        !stderr.contains("panicked") && !stderr.contains("Broken pipe"),
+        "stderr should be clean on a broken pipe, got: {stderr}"
+    );
+}
+
+#[test]
 fn commands_require_init() {
     let dir = tempfile::tempdir().unwrap();
     Command::cargo_bin("tracker")

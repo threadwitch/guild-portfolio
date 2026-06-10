@@ -94,6 +94,7 @@ enum Command {
 }
 
 fn main() {
+    reset_sigpipe();
     let cli = Cli::parse();
     let result = match cli.command {
         Command::Init => cmd_init(),
@@ -110,6 +111,18 @@ fn main() {
         std::process::exit(1);
     }
 }
+
+/// Restore default SIGPIPE handling so piping into `head` etc. exits quietly
+/// instead of panicking on a broken pipe (Rust ignores SIGPIPE by default).
+#[cfg(unix)]
+fn reset_sigpipe() {
+    unsafe {
+        libc::signal(libc::SIGPIPE, libc::SIG_DFL);
+    }
+}
+
+#[cfg(not(unix))]
+fn reset_sigpipe() {}
 
 fn status_colored(status: &data::Status, pad: usize) -> String {
     let s = format!("{:<width$}", status, width = pad);

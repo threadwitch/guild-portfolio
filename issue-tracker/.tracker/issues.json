@@ -315,12 +315,13 @@
       "id": 29,
       "title": "Piping tracker output into a closed pipe (e.g. `tracker list | head`) panics with `failed printing to stdout: Broken pipe` instead of exiting cleanly. Println macros panic on EPIPE; the CLI should treat a broken stdout pipe as a normal exit.",
       "description": null,
-      "status": "open",
+      "status": "done",
       "priority": "low",
       "labels": [
         "bug"
       ],
-      "created_at": "2026-06-10T01:48:50.349740039Z"
+      "created_at": "2026-06-10T01:48:50.349740039Z",
+      "updated_at": "2026-06-10T06:39:15.992463411Z"
     },
     {
       "id": 30,
