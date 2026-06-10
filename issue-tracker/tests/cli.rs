@@ -111,6 +111,27 @@ fn default_list_shows_only_active() {
 }
 
 #[test]
+fn multi_value_status_filter_uses_or() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "stays open"]).assert().success(); // 1 open
+    tracker(&dir).args(["create", "in prog"]).assert().success(); // 2
+    tracker(&dir).args(["update", "2", "--status", "in-progress"]).assert().success();
+    tracker(&dir).args(["create", "finished"]).assert().success(); // 3
+    tracker(&dir).args(["update", "3", "--status", "in-progress"]).assert().success();
+    tracker(&dir).args(["update", "3", "--status", "done"]).assert().success();
+    // open OR done -> #1 and #3, but not the in-progress #2
+    tracker(&dir)
+        .args(["list", "--status", "open", "--status", "done"])
+        .assert()
+        .success()
+        .stdout(
+            predicate::str::contains("stays open")
+                .and(predicate::str::contains("finished"))
+                .and(predicate::str::contains("in prog").not()),
+        );
+}
+
+#[test]
 fn labels_are_normalized_and_filter_is_case_insensitive() {
     let dir = init_repo();
     tracker(&dir).args(["create", "x", "--label", "BUG"]).assert().success();

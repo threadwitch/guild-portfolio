@@ -32,12 +32,12 @@ enum Command {
     },
     /// List issues (excludes closed by default)
     List {
-        /// Filter by status
+        /// Filter by status; can be repeated (OR logic)
         #[arg(short, long)]
-        status: Option<data::Status>,
-        /// Filter by priority
+        status: Vec<data::Status>,
+        /// Filter by priority; can be repeated (OR logic)
         #[arg(short, long)]
-        priority: Option<data::Priority>,
+        priority: Vec<data::Priority>,
         /// Filter by label; can be repeated (OR logic)
         #[arg(short, long)]
         label: Vec<String>,
@@ -345,20 +345,24 @@ fn cmd_update(id: u32, title: Option<String>, description: Option<String>, statu
     Ok(())
 }
 
-fn cmd_list(status_filter: Option<data::Status>, priority_filter: Option<data::Priority>, label_filter: Vec<String>) -> Result<()> {
+fn cmd_list(status_filter: Vec<data::Status>, priority_filter: Vec<data::Priority>, label_filter: Vec<String>) -> Result<()> {
     let store = data::load_store()?;
-    let has_other_filter = priority_filter.is_some() || !label_filter.is_empty();
+    let has_other_filter = !priority_filter.is_empty() || !label_filter.is_empty();
     let mut visible: Vec<&data::Issue> = store.issues
         .iter()
-        .filter(|i| match &status_filter {
-            // Explicit --status shows exactly that status (closed included).
-            Some(s) => &i.status == s,
-            // A non-status filter widens to everything but closed.
-            None if has_other_filter => i.status != data::Status::Closed,
-            // No filters at all: only active work.
-            None => matches!(i.status, data::Status::Open | data::Status::InProgress),
+        .filter(|i| {
+            if !status_filter.is_empty() {
+                // Explicit --status: OR over the requested statuses (closed included if asked).
+                status_filter.contains(&i.status)
+            } else if has_other_filter {
+                // A non-status filter widens to everything but closed.
+                i.status != data::Status::Closed
+            } else {
+                // No filters at all: only active work.
+                matches!(i.status, data::Status::Open | data::Status::InProgress)
+            }
         })
-        .filter(|i| priority_filter.as_ref().map_or(true, |p| &i.priority == p))
+        .filter(|i| priority_filter.is_empty() || priority_filter.contains(&i.priority))
         .filter(|i| {
             label_filter.is_empty()
                 || label_filter.iter().any(|l| i.labels.contains(&l.to_lowercase()))
@@ -366,7 +370,7 @@ fn cmd_list(status_filter: Option<data::Status>, priority_filter: Option<data::P
         .collect();
 
     if visible.is_empty() {
-        let has_filters = status_filter.is_some() || priority_filter.is_some() || !label_filter.is_empty();
+        let has_filters = !status_filter.is_empty() || !priority_filter.is_empty() || !label_filter.is_empty();
         if has_filters {
             println!("{}", "No issues match your filters.".dimmed());
         } else {
