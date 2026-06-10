@@ -104,7 +104,7 @@ fn normalize_labels(labels: Vec<String>) -> Result<Vec<String>> {
     labels
         .into_iter()
         .map(|l| {
-            let l = l.trim().to_string();
+            let l = l.trim().to_lowercase();
             if l.is_empty() {
                 anyhow::bail!("label cannot be empty");
             }
@@ -235,7 +235,7 @@ fn cmd_list(status_filter: Option<data::Status>, priority_filter: Option<data::P
         .filter(|i| priority_filter.as_ref().map_or(true, |p| &i.priority == p))
         .filter(|i| {
             label_filter.is_empty()
-                || label_filter.iter().any(|l| i.labels.contains(l))
+                || label_filter.iter().any(|l| i.labels.contains(&l.to_lowercase()))
         })
         .collect();
 

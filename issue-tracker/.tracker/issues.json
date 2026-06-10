@@ -144,7 +144,7 @@
     "id": 14,
     "title": "Labels are not normalized to lowercase on storage, making everything case-sensitive and inconsistent.  Labels aren't sanitized and the filtering is strict, so that can cause issues of mismatch.  I would prefer to normalize on entry.",
     "description": null,
-    "status": "open",
+    "status": "done",
     "priority": "high",
     "labels": [
       "bug"
