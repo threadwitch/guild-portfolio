@@ -166,7 +166,7 @@
     "id": 16,
     "title": "`Priority`'s sort order is encoded silently in declaration order. If anyone adds a Critical variant or rearranges the enum for any reason, the sort silently breaks. The Ord implementation for a type that has a meaningful semantic order should be explicit, not derived, or at minimum it should have a comment stating the invariant.",
     "description": null,
-    "status": "open",
+    "status": "done",
     "priority": "high",
     "labels": [
       "bug"

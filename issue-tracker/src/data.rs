@@ -14,12 +14,37 @@ pub enum Status {
     Closed,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, clap::ValueEnum)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, clap::ValueEnum)]
 #[serde(rename_all = "snake_case")]
 pub enum Priority {
     Low,
     Medium,
     High,
+}
+
+impl Priority {
+    /// Explicit sort rank: higher is more urgent. This — not the enum's
+    /// declaration order — defines how priorities sort, so reordering or
+    /// inserting variants can't silently change the sort.
+    fn rank(&self) -> u8 {
+        match self {
+            Priority::Low => 0,
+            Priority::Medium => 1,
+            Priority::High => 2,
+        }
+    }
+}
+
+impl Ord for Priority {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.rank().cmp(&other.rank())
+    }
+}
+
+impl PartialOrd for Priority {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
