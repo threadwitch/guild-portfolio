@@ -111,7 +111,7 @@
     "id": 11,
     "title": "`save_issuse()` is a non-atomic write. It truncates the file and writes in place. Perferred behavior is to use a temp file and `fs::rename()`",
     "description": null,
-    "status": "open",
+    "status": "done",
     "priority": "high",
     "labels": [
       "bug"

@@ -56,6 +56,9 @@ pub fn load_issues() -> anyhow::Result<Vec<Issue>> {
 
 pub fn save_issues(issues: &[Issue]) -> anyhow::Result<()> {
     let contents = serde_json::to_string_pretty(issues)?;
-    fs::write(issues_path()?, contents).context("could not write issues file")?;
+    let path = issues_path()?;
+    let tmp = path.with_extension("json.tmp");
+    fs::write(&tmp, contents).context("could not write issues file")?;
+    fs::rename(&tmp, &path).context("could not replace issues file")?;
     Ok(())
 }
