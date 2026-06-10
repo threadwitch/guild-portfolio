@@ -51,6 +51,9 @@ enum Command {
     Delete {
         /// Issue ID
         id: u32,
+        /// Skip the confirmation prompt (for scripts)
+        #[arg(short = 'y', long, visible_alias = "force")]
+        yes: bool,
     },
     /// Close an issue (sets status to closed; keeps the record)
     Close {
@@ -97,7 +100,7 @@ fn main() {
         Command::Create { title, description, priority, label } => cmd_create(title, description, priority, label),
         Command::List { status, priority, label } => cmd_list(status, priority, label),
         Command::Show { id } => cmd_show(id),
-        Command::Delete { id } => cmd_delete(id),
+        Command::Delete { id, yes } => cmd_delete(id, yes),
         Command::Close { id } => cmd_close(id),
         Command::Edit { id } => cmd_edit(id),
         Command::Update { id, title, description, status, priority, label, add_label, clear_labels } => cmd_update(id, title, description, status, priority, label, add_label, clear_labels),
@@ -207,30 +210,31 @@ fn cmd_show(id: u32) -> Result<()> {
     Ok(())
 }
 
-fn cmd_delete(id: u32) -> Result<()> {
+fn cmd_delete(id: u32, yes: bool) -> Result<()> {
     let mut store = data::load_store()?;
     let pos = store.issues
         .iter()
         .position(|i| i.id == id)
         .ok_or_else(|| anyhow::anyhow!("no issue with id #{id}"))?;
 
-    println!(
-        "{}",
-        "Delete removes the issue permanently. To retire it while keeping the record, use `tracker close` instead.".dimmed()
-    );
-    print!("Delete issue #{id} \"{}\"? [y/N] ", store.issues[pos].title);
-    std::io::stdout().flush()?;
-
-    let mut input = String::new();
-    std::io::stdin().read_line(&mut input)?;
-
-    if input.trim().eq_ignore_ascii_case("y") || input.trim().eq_ignore_ascii_case("yes") {
-        store.issues.remove(pos);
-        data::save_store(&store)?;
-        println!("{}", format!("Deleted issue #{id}").green());
-    } else {
-        println!("{}", "Aborted".dimmed());
+    if !yes {
+        println!(
+            "{}",
+            "Delete removes the issue permanently. To retire it while keeping the record, use `tracker close` instead.".dimmed()
+        );
+        print!("Delete issue #{id} \"{}\"? [y/N] ", store.issues[pos].title);
+        std::io::stdout().flush()?;
+        let mut input = String::new();
+        std::io::stdin().read_line(&mut input)?;
+        if !(input.trim().eq_ignore_ascii_case("y") || input.trim().eq_ignore_ascii_case("yes")) {
+            println!("{}", "Aborted".dimmed());
+            return Ok(());
+        }
     }
+
+    store.issues.remove(pos);
+    data::save_store(&store)?;
+    println!("{}", format!("Deleted issue #{id}").green());
     Ok(())
 }
 

@@ -56,6 +56,32 @@ fn ids_are_not_reused_after_delete() {
 }
 
 #[test]
+fn delete_with_yes_skips_prompt() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "a"]).assert().success();
+    // No stdin provided; --yes must not block on the prompt.
+    tracker(&dir)
+        .args(["delete", "1", "--yes"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Deleted issue #1"));
+    tracker(&dir).args(["show", "1"]).assert().failure();
+}
+
+#[test]
+fn delete_aborts_on_no() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "a"]).assert().success();
+    tracker(&dir)
+        .args(["delete", "1"])
+        .write_stdin("n\n")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Aborted"));
+    tracker(&dir).args(["show", "1"]).assert().success();
+}
+
+#[test]
 fn invalid_status_transition_is_rejected() {
     let dir = init_repo();
     tracker(&dir).args(["create", "a"]).assert().success();

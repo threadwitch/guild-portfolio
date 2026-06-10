@@ -234,7 +234,7 @@
       "id": 22,
       "title": "`cmd_delete` has no `--yes`/`--force` flag for scripted use.  Add one.",
       "description": null,
-      "status": "open",
+      "status": "done",
       "priority": "medium",
       "labels": [
         "bug"
