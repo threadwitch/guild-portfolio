@@ -334,7 +334,14 @@ fn cmd_list(status_filter: Option<data::Status>, priority_filter: Option<data::P
         return Ok(());
     }
 
-    visible.sort_by(|a, b| b.priority.cmp(&a.priority));
+    visible.sort_by(|a, b| {
+        // Highest priority first; within a bracket, done sinks to the bottom.
+        b.priority.cmp(&a.priority).then_with(|| {
+            let a_done = a.status == data::Status::Done;
+            let b_done = b.status == data::Status::Done;
+            a_done.cmp(&b_done)
+        })
+    });
 
     for issue in visible {
         let status = status_colored(&issue.status, 12);

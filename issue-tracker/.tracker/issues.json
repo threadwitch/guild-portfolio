@@ -58,7 +58,7 @@
       "id": 6,
       "title": "Sort the issues with a status of `done` to the bottom of their priority bracket by default.`",
       "description": null,
-      "status": "open",
+      "status": "done",
       "priority": "medium",
       "labels": [
         "fix"
