@@ -21,25 +21,25 @@ enum Command {
         /// Issue title
         title: String,
         /// Issue description
-        #[arg(long)]
+        #[arg(short, long)]
         description: Option<String>,
         /// Priority level
-        #[arg(long, default_value = "medium")]
+        #[arg(short, long, default_value = "medium")]
         priority: data::Priority,
         /// Label to apply; can be repeated
-        #[arg(long)]
+        #[arg(short, long)]
         label: Vec<String>,
     },
     /// List issues (excludes closed by default)
     List {
         /// Filter by status
-        #[arg(long)]
+        #[arg(short, long)]
         status: Option<data::Status>,
         /// Filter by priority
-        #[arg(long)]
+        #[arg(short, long)]
         priority: Option<data::Priority>,
         /// Filter by label; can be repeated (OR logic)
-        #[arg(long)]
+        #[arg(short, long)]
         label: Vec<String>,
     },
     /// Show full details of an issue
@@ -67,16 +67,16 @@ enum Command {
         /// Issue ID
         id: u32,
         /// New description (pass "" to clear)
-        #[arg(long)]
+        #[arg(short, long)]
         description: Option<String>,
         /// New status
-        #[arg(long)]
+        #[arg(short, long)]
         status: Option<data::Status>,
         /// New priority
-        #[arg(long)]
+        #[arg(short, long)]
         priority: Option<data::Priority>,
         /// Replace all labels; can be repeated
-        #[arg(long)]
+        #[arg(short, long)]
         label: Vec<String>,
     },
 }

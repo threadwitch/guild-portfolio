@@ -36,7 +36,7 @@
       "id": 4,
       "title": "Give short aliases for the flags, i.e. `-p --priority`, etc.",
       "description": null,
-      "status": "open",
+      "status": "done",
       "priority": "high",
       "labels": [
         "feature"
