@@ -20,6 +20,7 @@ pub enum Priority {
     Low,
     Medium,
     High,
+    Critical,
 }
 
 impl Priority {
@@ -31,6 +32,7 @@ impl Priority {
             Priority::Low => 0,
             Priority::Medium => 1,
             Priority::High => 2,
+            Priority::Critical => 3,
         }
     }
 }

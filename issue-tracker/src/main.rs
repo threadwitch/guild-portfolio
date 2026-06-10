@@ -155,6 +155,7 @@ fn cmd_show(id: u32) -> Result<()> {
         .ok_or_else(|| anyhow::anyhow!("no issue with id #{id}"))?;
 
     let priority = match issue.priority {
+        data::Priority::Critical => "critical".red().bold().underline().to_string(),
         data::Priority::High => "high".red().bold().to_string(),
         data::Priority::Medium => "medium".yellow().to_string(),
         data::Priority::Low => "low".dimmed().to_string(),
@@ -254,6 +255,7 @@ fn cmd_list(status_filter: Option<data::Status>, priority_filter: Option<data::P
     for issue in visible {
         let status = status_colored(&issue.status, 12);
         let priority = match issue.priority {
+            data::Priority::Critical => format!("{:<8}", "critical").red().bold().underline().to_string(),
             data::Priority::High => format!("{:<8}", "high").red().bold().to_string(),
             data::Priority::Medium => format!("{:<8}", "medium").yellow().to_string(),
             data::Priority::Low => format!("{:<8}", "low").dimmed().to_string(),

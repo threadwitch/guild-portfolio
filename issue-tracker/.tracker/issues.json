@@ -177,7 +177,7 @@
     "id": 17,
     "title": "Add `critical` priority at higher sort than `high`.",
     "description": null,
-    "status": "open",
+    "status": "done",
     "priority": "low",
     "labels": [
       "feature"
