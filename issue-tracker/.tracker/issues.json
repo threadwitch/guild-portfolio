@@ -497,13 +497,13 @@
       "id": 44,
       "title": "`close` has a first class command, but reopen doesn't.",
       "description": "This is confusing to the user because it's a one-shot to close an issue, but you have to use `update --status open` to reopen a closed issue.  Not only that, but that's the **only** valid way to do that.  I'm considering a first class `reopen` command, and _possibly_ having that also move issues from `done` to `open`, if something wasn't quite finished, instead of having to round-trip it through `in-progress`.  Prompt for design discussion to review the logic here.",
-      "status": "open",
+      "status": "done",
       "priority": "high",
       "labels": [
         "feature"
       ],
       "created_at": "2026-06-11T01:28:35.819419762Z",
-      "updated_at": "2026-06-11T01:28:35.819419762Z"
+      "updated_at": "2026-06-11T06:12:23.805833579Z"
     },
     {
       "id": 45,

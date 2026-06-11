@@ -94,6 +94,30 @@ fn priority_short_alias_accepted() {
 }
 
 #[test]
+fn reopen_unclosees_only() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "x"]).assert().success();
+    tracker(&dir).args(["close", "1"]).assert().success();
+    // closed -> open
+    tracker(&dir)
+        .args(["reopen", "1"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Reopened issue #1"));
+    tracker(&dir)
+        .args(["show", "1"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Status:").and(predicate::str::contains("open")));
+    // Reopening a non-closed issue errors.
+    tracker(&dir)
+        .args(["reopen", "1"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("not closed"));
+}
+
+#[test]
 fn invalid_status_transition_is_rejected() {
     let dir = init_repo();
     tracker(&dir).args(["create", "a"]).assert().success();

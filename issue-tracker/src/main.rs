@@ -60,6 +60,11 @@ enum Command {
         /// Issue ID
         id: u32,
     },
+    /// Reopen a closed issue (sets status back to open)
+    Reopen {
+        /// Issue ID
+        id: u32,
+    },
     /// Edit an issue's description in $EDITOR
     Edit {
         /// Issue ID
@@ -119,6 +124,7 @@ fn main() {
         Command::Show { id } => cmd_show(id),
         Command::Delete { id, yes } => cmd_delete(id, yes),
         Command::Close { id } => cmd_close(id),
+        Command::Reopen { id } => cmd_reopen(id),
         Command::Edit { id } => cmd_edit(id),
         Command::Completions { shell } => cmd_completions(shell),
         Command::Update { id, title, description, status, priority, label, add_label, clear_labels, remove_label } => cmd_update(id, title, description, status, priority, label, add_label, clear_labels, remove_label),
@@ -286,6 +292,23 @@ fn cmd_close(id: u32) -> Result<()> {
     issue.touch();
     data::save_store(&store)?;
     println!("{}", format!("Closed issue #{id}").green());
+    Ok(())
+}
+
+fn cmd_reopen(id: u32) -> Result<()> {
+    let _lock = data::lock_exclusive()?;
+    let mut store = data::load_store()?;
+    let issue = store.issues
+        .iter_mut()
+        .find(|i| i.id == id)
+        .ok_or_else(|| anyhow::anyhow!("no issue with id #{id}"))?;
+    if issue.status != data::Status::Closed {
+        anyhow::bail!("issue #{id} is not closed (only closed issues can be reopened)");
+    }
+    issue.status = data::Status::Open;
+    issue.touch();
+    data::save_store(&store)?;
+    println!("{}", format!("Reopened issue #{id}").green());
     Ok(())
 }
 
