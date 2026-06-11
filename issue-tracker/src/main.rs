@@ -288,6 +288,9 @@ fn cmd_close(id: u32) -> Result<()> {
         .iter_mut()
         .find(|i| i.id == id)
         .ok_or_else(|| anyhow::anyhow!("no issue with id #{id}"))?;
+    if issue.status == data::Status::Closed {
+        anyhow::bail!("issue #{id} is already closed");
+    }
     issue.status = data::Status::Closed;
     issue.touch();
     data::save_store(&store)?;

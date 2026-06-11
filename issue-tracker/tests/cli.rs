@@ -94,6 +94,18 @@ fn priority_short_alias_accepted() {
 }
 
 #[test]
+fn close_already_closed_errors() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "x"]).assert().success();
+    tracker(&dir).args(["close", "1"]).assert().success();
+    tracker(&dir)
+        .args(["close", "1"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("already closed"));
+}
+
+#[test]
 fn reopen_unclosees_only() {
     let dir = init_repo();
     tracker(&dir).args(["create", "x"]).assert().success();
