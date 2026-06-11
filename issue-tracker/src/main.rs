@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
 use colored::Colorize;
 use std::io::Write;
+use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};
 
 #[derive(Parser)]
 #[command(name = "tracker", about = "Project issue tracker", version)]
@@ -541,7 +542,7 @@ fn cmd_list(status_filter: Vec<data::Status>, priority_filter: Vec<data::Priorit
             labels_plain.dimmed().to_string()
         };
         let title = match term_width {
-            Some(w) => truncate_title(&issue.title, prefix_w + labels_plain.chars().count(), w),
+            Some(w) => truncate_title(&issue.title, prefix_w + labels_plain.width(), w),
             None => issue.title.clone(),
         };
         println!("#{:<id_width$} {} {} {}{}", issue.id, status, priority, title, labels);
@@ -553,15 +554,25 @@ fn cmd_list(status_filter: Vec<data::Status>, priority_filter: Vec<data::Priorit
 /// `used` is the display width consumed by everything else on the row.
 fn truncate_title(title: &str, used: usize, term_width: usize) -> String {
     let avail = term_width.saturating_sub(used);
-    if title.chars().count() <= avail {
+    if title.width() <= avail {
         return title.to_string();
     }
     if avail == 0 {
         return String::new();
     }
-    let mut s: String = title.chars().take(avail - 1).collect(); // reserve 1 col for …
-    s.push('…');
-    s
+    let budget = avail - 1; // reserve one column for the ellipsis
+    let mut width = 0;
+    let mut out = String::new();
+    for ch in title.chars() {
+        let cw = ch.width().unwrap_or(0);
+        if width + cw > budget {
+            break;
+        }
+        width += cw;
+        out.push(ch);
+    }
+    out.push('…');
+    out
 }
 
 #[cfg(test)]
@@ -593,5 +604,16 @@ mod tests {
     #[test]
     fn zero_available_yields_empty() {
         assert_eq!(truncate_title("abc", 10, 5), "");
+    }
+
+    #[test]
+    fn truncate_title_counts_display_columns() {
+        use unicode_width::UnicodeWidthStr;
+        // CJK chars are 2 columns each; "中文字" = 6 cols. With avail=5, budget=4
+        // fits 2 chars (4 cols) + ellipsis (1 col) = 5 — not 3 chars as a naive
+        // char-count would allow (which would overflow to 7 cols).
+        let out = truncate_title("中文字", 0, 5);
+        assert_eq!(out, "中文…");
+        assert_eq!(out.width(), 5);
     }
 }

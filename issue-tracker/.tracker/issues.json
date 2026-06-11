@@ -509,13 +509,13 @@
       "id": 45,
       "title": "`truncate_title` counts chars, not display columns.",
       "description": "This is an issue for CJK characters, and is easily fixable with the `unicode-width` crate, it seems.",
-      "status": "open",
+      "status": "done",
       "priority": "low",
       "labels": [
         "accessibility"
       ],
       "created_at": "2026-06-11T01:35:14.011651655Z",
-      "updated_at": "2026-06-11T01:35:14.011651655Z"
+      "updated_at": "2026-06-11T06:26:16.982365399Z"
     },
     {
       "id": 46,
