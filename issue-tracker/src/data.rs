@@ -162,6 +162,28 @@ pub fn save_store(store: &Store) -> anyhow::Result<()> {
     Ok(())
 }
 
+/// Acquire an exclusive lock that serializes the whole load→mutate→save cycle
+/// across concurrent invocations. Held until the returned handle drops (flock
+/// releases when the fd closes — on return, panic, or process exit).
+pub fn lock_exclusive() -> anyhow::Result<fs::File> {
+    let path = find_tracker_dir()?.join("lock");
+    let file = fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .open(&path)
+        .context("could not open tracker lock file")?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::io::AsRawFd;
+        // Blocks until no other process holds the lock, ordering writers.
+        if unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX) } != 0 {
+            return Err(std::io::Error::last_os_error())
+                .context("could not acquire tracker lock");
+        }
+    }
+    Ok(file)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

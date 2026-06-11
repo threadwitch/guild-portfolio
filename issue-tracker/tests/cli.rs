@@ -314,6 +314,38 @@ fn completions_generate_for_all_shells() {
 }
 
 #[test]
+fn concurrent_creates_do_not_lose_writes() {
+    let dir = init_repo();
+    let bin = env!("CARGO_BIN_EXE_tracker");
+    let n = 20;
+    // Fire off N creates at once; the write lock must serialize them.
+    let children: Vec<_> = (0..n)
+        .map(|i| {
+            std::process::Command::new(bin)
+                .args(["create", &format!("issue {i}")])
+                .current_dir(dir.path())
+                .env("NO_COLOR", "1")
+                .stdout(std::process::Stdio::null())
+                .spawn()
+                .unwrap()
+        })
+        .collect();
+    for mut c in children {
+        assert!(c.wait().unwrap().success());
+    }
+    // Every create must survive the race — N issues, one line each (piped: no truncation).
+    let out = Command::cargo_bin("tracker")
+        .unwrap()
+        .current_dir(dir.path())
+        .env("NO_COLOR", "1")
+        .arg("list")
+        .output()
+        .unwrap();
+    let count = String::from_utf8_lossy(&out.stdout).lines().count();
+    assert_eq!(count, n, "expected {n} issues after concurrent creates, got {count}");
+}
+
+#[test]
 fn commands_require_init() {
     let dir = tempfile::tempdir().unwrap();
     Command::cargo_bin("tracker")

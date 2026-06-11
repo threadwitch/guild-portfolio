@@ -1,1 +1,5 @@
 issue-tracker/target/*
+
+# Tracker runtime artifacts (the issues.json data file IS tracked)
+issue-tracker/.tracker/lock
+issue-tracker/.tracker/issues.json.tmp

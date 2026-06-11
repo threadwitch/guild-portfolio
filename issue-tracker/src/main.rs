@@ -189,6 +189,7 @@ fn cmd_create(title: String, description: Option<String>, priority: data::Priori
     }
     let description = description.map(|d| d.trim().to_string()).filter(|d| !d.is_empty());
     let labels = normalize_labels(labels)?;
+    let _lock = data::lock_exclusive()?;
     let mut store = data::load_store()?;
     let id = store.next_id;
     let now = chrono::Utc::now();
@@ -242,6 +243,7 @@ fn cmd_show(id: u32) -> Result<()> {
 }
 
 fn cmd_delete(id: u32, yes: bool) -> Result<()> {
+    let _lock = data::lock_exclusive()?;
     let mut store = data::load_store()?;
     let pos = store.issues
         .iter()
@@ -270,6 +272,7 @@ fn cmd_delete(id: u32, yes: bool) -> Result<()> {
 }
 
 fn cmd_close(id: u32) -> Result<()> {
+    let _lock = data::lock_exclusive()?;
     let mut store = data::load_store()?;
     let issue = store.issues
         .iter_mut()
@@ -299,6 +302,7 @@ fn cmd_edit(id: u32) -> Result<()> {
         .or_else(|_| std::env::var("VISUAL"))
         .map_err(|_| anyhow::anyhow!("no editor found — set $EDITOR or $VISUAL"))?;
 
+    let _lock = data::lock_exclusive()?;
     let mut store = data::load_store()?;
     let pos = store.issues
         .iter()
@@ -339,6 +343,7 @@ fn cmd_update(id: u32, title: Option<String>, description: Option<String>, statu
         && labels.is_empty() && add_labels.is_empty() && !clear_labels {
         anyhow::bail!("at least one option required (--title, --description, --status, --priority, --label, --add-label, --clear-labels)");
     }
+    let _lock = data::lock_exclusive()?;
     let mut store = data::load_store()?;
     let issue = store.issues
         .iter_mut()
