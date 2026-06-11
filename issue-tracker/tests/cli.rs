@@ -82,6 +82,18 @@ fn delete_aborts_on_no() {
 }
 
 #[test]
+fn priority_short_alias_accepted() {
+    let dir = init_repo();
+    // `-p c` is accepted as an alias for `critical`.
+    tracker(&dir).args(["create", "x", "-p", "c"]).assert().success();
+    tracker(&dir)
+        .args(["show", "1"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("critical"));
+}
+
+#[test]
 fn invalid_status_transition_is_rejected() {
     let dir = init_repo();
     tracker(&dir).args(["create", "a"]).assert().success();

@@ -43,9 +43,13 @@ impl std::fmt::Display for Status {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, clap::ValueEnum)]
 #[serde(rename_all = "snake_case")]
 pub enum Priority {
+    #[value(alias = "l")]
     Low,
+    #[value(alias = "m")]
     Medium,
+    #[value(alias = "h")]
     High,
+    #[value(alias = "c")]
     Critical,
 }
 
@@ -263,5 +267,16 @@ mod tests {
         assert_eq!(Priority::Critical.to_string(), "critical");
         assert_eq!(Priority::Low.to_string(), "low");
         assert_eq!(format!("{:<8}", Priority::High), "high    ");
+    }
+
+    #[test]
+    fn priority_short_aliases_parse() {
+        use clap::ValueEnum;
+        assert_eq!(Priority::from_str("c", false).unwrap(), Priority::Critical);
+        assert_eq!(Priority::from_str("h", false).unwrap(), Priority::High);
+        assert_eq!(Priority::from_str("m", false).unwrap(), Priority::Medium);
+        assert_eq!(Priority::from_str("l", false).unwrap(), Priority::Low);
+        // Full names still parse.
+        assert_eq!(Priority::from_str("critical", false).unwrap(), Priority::Critical);
     }
 }
