@@ -1,5 +1,5 @@
 {
-  "next_id": 31,
+  "next_id": 48,
   "issues": [
     {
       "id": 1,
@@ -336,6 +336,210 @@
       ],
       "created_at": "2026-06-10T06:33:04.247976532Z",
       "updated_at": "2026-06-10T06:34:49.536487974Z"
+    },
+    {
+      "id": 31,
+      "title": "Issues are marked as updated on creation",
+      "description": "Issues are marked as updated on creation, which is incorrect.  It conveys information that isn't intended.  It's also verified by a test, so that needs to be updated so that it doesn't catch the fix as an error.",
+      "status": "open",
+      "priority": "low",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-11T00:13:36.612647420Z",
+      "updated_at": "2026-06-11T00:13:36.612647420Z"
+    },
+    {
+      "id": 32,
+      "title": "`cmd_close` silently no-ops on an already closed issue.",
+      "description": "When the `close` command on a closed issue, the program touches the issue, creating an update, and then reports a successful close.  The correct behavior would be to report that the issue is already closed and not touch it.",
+      "status": "open",
+      "priority": "medium",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-11T00:16:13.275496041Z",
+      "updated_at": "2026-06-11T00:16:13.275496041Z"
+    },
+    {
+      "id": 33,
+      "title": "There's another fixed width that collides with a derived value in `id_w`",
+      "description": "The issue is at `main.rs:161-172`, and are the same value encoded as dynamic in one spot, and fixed in another.  Better to make sure that they don't conflict in the future.",
+      "status": "open",
+      "priority": "medium",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-11T00:33:38.348507728Z",
+      "updated_at": "2026-06-11T00:33:38.348507728Z"
+    },
+    {
+      "id": 34,
+      "title": "`normalize_labels` does not de-dupe on on create or replace",
+      "description": "The `add-label` command does deduplication, but the other commands don't.  Unify the behavior to always deduplicate.",
+      "status": "open",
+      "priority": "medium",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-11T00:37:05.772764070Z",
+      "updated_at": "2026-06-11T00:37:05.772764070Z"
+    },
+    {
+      "id": 35,
+      "title": "No locking; concurrent tool invocations cause a race condition and data loss.",
+      "description": "We need to add a write lock to properly order scripted writes and avoid data loss.  Distinct from atomic writes, this is about multiple full writes racing each other.",
+      "status": "open",
+      "priority": "critical",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-11T00:54:48.272028357Z",
+      "updated_at": "2026-06-11T00:54:48.272028357Z"
+    },
+    {
+      "id": 36,
+      "title": "Temp file on the read-error path isn't cleaned up.",
+      "description": "This is a case where we need to use the proper Rust idiom for tempfile cleanup because the editor-failure path cleans up after itself automatically, but other errors don't.  This leaves orphaned files in /tmp.",
+      "status": "open",
+      "priority": "medium",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-11T00:59:15.971460762Z",
+      "updated_at": "2026-06-11T00:59:15.971460762Z"
+    },
+    {
+      "id": 37,
+      "title": "Predictable temp path in a shared directory.",
+      "description": "The temp files created by opening a description in an editor are named predictably, which means that they could be pre-emptively symlinked, and cause issues.  There's also the issue where this can cause collisions.  There's an idiomatic fix ni `tempfile::NamedTempFile` and we should use it.",
+      "status": "open",
+      "priority": "high",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-11T01:04:09.123505375Z",
+      "updated_at": "2026-06-11T01:04:09.123505375Z"
+    },
+    {
+      "id": 38,
+      "title": "DESIGN.md is out of date in significant ways.",
+      "description": "The design doc is out of date because I used it as the starting point, and haven't updated it.  The changes are partially documented in PROCESS.md, and the actualy work is saved in the tracker log itself.  DESIGN.md is a living document to give the agents context for the current state, and to top it off, there's no basic documentation of the tool without digging through the `--help` options.",
+      "status": "open",
+      "priority": "critical",
+      "labels": [
+        "docs"
+      ],
+      "created_at": "2026-06-11T01:12:27.090684757Z",
+      "updated_at": "2026-06-11T01:12:27.090684757Z"
+    },
+    {
+      "id": 39,
+      "title": "No README for the project.",
+      "description": "This project needs a README to explain the basic functions and lay out the current state.  While this is a high priority, it should only be tackled once the features are stable.  Save until all the other issues for this round of work are handled.",
+      "status": "open",
+      "priority": "high",
+      "labels": [
+        "docs"
+      ],
+      "created_at": "2026-06-11T01:15:29.924051113Z",
+      "updated_at": "2026-06-11T01:15:29.924051113Z"
+    },
+    {
+      "id": 40,
+      "title": "No way to remove a single label from an issue.",
+      "description": "There's no `--label-remove` to remove a single label, it's all or nothing.  Since the rest of the ergonomics for the labels are implemented, we should finish this last little issue.",
+      "status": "open",
+      "priority": "high",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-06-11T01:17:39.998495824Z",
+      "updated_at": "2026-06-11T01:17:39.998495824Z"
+    },
+    {
+      "id": 41,
+      "title": "The tab complete for `-p` isn't working.",
+      "description": "In my use inputting all these issues, the tab completion for the priority levels doesn't work during the create workflow.",
+      "status": "open",
+      "priority": "high",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-11T01:19:10.036245087Z",
+      "updated_at": "2026-06-11T01:19:10.036245087Z"
+    },
+    {
+      "id": 42,
+      "title": "Empty label filter fails silently instead of erroring.",
+      "description": "The label write rejects empty labels being written, but the filter for reading issues doesn't.  Make them match.",
+      "status": "open",
+      "priority": "high",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-11T01:20:53.943106064Z",
+      "updated_at": "2026-06-11T01:20:53.943106064Z"
+    },
+    {
+      "id": 43,
+      "title": "Filter normalization is ad hoc, and not consistent across read/write ops.",
+      "description": "Like issue 42, this is another inconsistency between read and write.  Labels are trimmed on write, but not on read.  This means that an extra space on the list filter will error and find no issues.  All read and write ops should share the same input validation for consistency, if possible.",
+      "status": "open",
+      "priority": "high",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-11T01:23:59.533216686Z",
+      "updated_at": "2026-06-11T01:23:59.533216686Z"
+    },
+    {
+      "id": 44,
+      "title": "`close` has a first class command, but reopen doesn't.",
+      "description": "This is confusing to the user because it's a one-shot to close an issue, but you have to use `update --status open` to reopen a closed issue.  Not only that, but that's the **only** valid way to do that.  I'm considering a first class `reopen` command, and _possibly_ having that also move issues from `done` to `open`, if something wasn't quite finished, instead of having to round-trip it through `in-progress`.  Prompt for design discussion to review the logic here.",
+      "status": "open",
+      "priority": "high",
+      "labels": [
+        "feature"
+      ],
+      "created_at": "2026-06-11T01:28:35.819419762Z",
+      "updated_at": "2026-06-11T01:28:35.819419762Z"
+    },
+    {
+      "id": 45,
+      "title": "`truncate_title` counts chars, not display columns.",
+      "description": "This is an issue for CJK characters, and is easily fixable with the `unicode-width` crate, it seems.",
+      "status": "open",
+      "priority": "low",
+      "labels": [
+        "accessibility"
+      ],
+      "created_at": "2026-06-11T01:35:14.011651655Z",
+      "updated_at": "2026-06-11T01:35:14.011651655Z"
+    },
+    {
+      "id": 46,
+      "title": "Review test coverage for these additional cases.",
+      "description": "1. No test asserts the list sort order actually puts critical above high or sinks done to the bottom — only the Ord impl is unit-tested (data.rs:169-174), not the rendered ordering in cmd_list (main.rs:428-435).  2. No test for the has_other_filter widening rule (main.rs:403-409) — i.e. that --priority high includes done but excludes closed. That branch encodes the trickiest requirement in the whole program (issue #7) and is untested end-to-end.  3. No test for close on an already-closed issue (bug #3 would have been caught).  4. No test for duplicate labels on create (bug #5).",
+      "status": "open",
+      "priority": "low",
+      "labels": [
+        "testing"
+      ],
+      "created_at": "2026-06-11T01:38:26.837714641Z",
+      "updated_at": "2026-06-11T01:38:26.837714641Z"
+    },
+    {
+      "id": 47,
+      "title": "The short priority aliases (`c`, `h`, `m`, `l`) aren't working.",
+      "description": null,
+      "status": "open",
+      "priority": "medium",
+      "labels": [
+        "bug"
+      ],
+      "created_at": "2026-06-11T01:39:24.546693823Z",
+      "updated_at": "2026-06-11T01:39:24.546693823Z"
     }
   ]
 }
