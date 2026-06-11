@@ -365,13 +365,13 @@
       "id": 33,
       "title": "There's another fixed width that collides with a derived value in `id_w`",
       "description": "The issue is at `main.rs:161-172`, and are the same value encoded as dynamic in one spot, and fixed in another.  Better to make sure that they don't conflict in the future.",
-      "status": "open",
+      "status": "done",
       "priority": "medium",
       "labels": [
         "bug"
       ],
       "created_at": "2026-06-11T00:33:38.348507728Z",
-      "updated_at": "2026-06-11T00:33:38.348507728Z"
+      "updated_at": "2026-06-11T06:22:18.381934567Z"
     },
     {
       "id": 34,

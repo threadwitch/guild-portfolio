@@ -520,6 +520,10 @@ fn cmd_list(status_filter: Vec<data::Status>, priority_filter: Vec<data::Priorit
         .map(|p| p.to_string().len())
         .max()
         .unwrap_or(0);
+    // Id column width from the widest visible id — one source of truth for both
+    // the row format and the truncation prefix (no hardcoded column width).
+    let id_width = visible.iter().map(|i| i.id.to_string().len()).max().unwrap_or(1);
+    let prefix_w = 1 + id_width + 1 + status_width + 1 + priority_width + 1;
     // When stdout is a terminal, truncate long titles to fit its width.
     // When piped (None), leave titles full so scripts get complete data.
     let term_width = terminal_size::terminal_size().map(|(w, _)| w.0 as usize);
@@ -537,14 +541,10 @@ fn cmd_list(status_filter: Vec<data::Status>, priority_filter: Vec<data::Priorit
             labels_plain.dimmed().to_string()
         };
         let title = match term_width {
-            Some(w) => {
-                let id_w = issue.id.to_string().len().max(4);
-                let prefix_w = 1 + id_w + 1 + status_width + 1 + priority_width + 1;
-                truncate_title(&issue.title, prefix_w + labels_plain.chars().count(), w)
-            }
+            Some(w) => truncate_title(&issue.title, prefix_w + labels_plain.chars().count(), w),
             None => issue.title.clone(),
         };
-        println!("#{:<4} {} {} {}{}", issue.id, status, priority, title, labels);
+        println!("#{:<id_width$} {} {} {}{}", issue.id, status, priority, title, labels);
     }
     Ok(())
 }
