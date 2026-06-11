@@ -496,6 +496,117 @@ fn concurrent_creates_do_not_lose_writes() {
 }
 
 #[test]
+fn list_renders_priority_order_and_sinks_done() {
+    let dir = init_repo();
+    // Shared label so a non-status filter makes done visible (per #7 widening).
+    tracker(&dir).args(["create", "high-open", "-p", "high", "-l", "x"]).assert().success(); // 1
+    tracker(&dir).args(["create", "crit-open", "-p", "critical", "-l", "x"]).assert().success(); // 2
+    tracker(&dir).args(["create", "high-done", "-p", "high", "-l", "x"]).assert().success(); // 3
+    tracker(&dir).args(["update", "3", "-s", "in-progress"]).assert().success();
+    tracker(&dir).args(["update", "3", "-s", "done"]).assert().success();
+    let out = Command::cargo_bin("tracker")
+        .unwrap()
+        .current_dir(dir.path())
+        .env("NO_COLOR", "1")
+        .args(["list", "--label", "x"])
+        .output()
+        .unwrap();
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    let order: Vec<&str> = stdout
+        .lines()
+        .filter_map(|l| {
+            if l.contains("crit-open") {
+                Some("crit-open")
+            } else if l.contains("high-open") {
+                Some("high-open")
+            } else if l.contains("high-done") {
+                Some("high-done")
+            } else {
+                None
+            }
+        })
+        .collect();
+    // critical above high; within high, open before the sunk done.
+    assert_eq!(order, vec!["crit-open", "high-open", "high-done"]);
+}
+
+#[test]
+fn priority_filter_includes_done_excludes_closed() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "h-open", "-p", "high"]).assert().success(); // 1
+    tracker(&dir).args(["create", "h-done", "-p", "high"]).assert().success(); // 2
+    tracker(&dir).args(["update", "2", "-s", "in-progress"]).assert().success();
+    tracker(&dir).args(["update", "2", "-s", "done"]).assert().success();
+    tracker(&dir).args(["create", "h-closed", "-p", "high"]).assert().success(); // 3
+    tracker(&dir).args(["close", "3"]).assert().success();
+    tracker(&dir).args(["create", "m-open", "-p", "medium"]).assert().success(); // 4
+    let out = Command::cargo_bin("tracker")
+        .unwrap()
+        .current_dir(dir.path())
+        .env("NO_COLOR", "1")
+        .args(["list", "--priority", "high"])
+        .output()
+        .unwrap();
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    assert!(stdout.contains("h-open"), "open high should show");
+    assert!(stdout.contains("h-done"), "done high should show (widening)");
+    assert!(!stdout.contains("h-closed"), "closed must be excluded");
+    assert!(!stdout.contains("m-open"), "other priorities filtered out");
+}
+
+#[test]
+fn list_id_column_aligns_across_digit_widths() {
+    let dir = init_repo();
+    for i in 1..=10 {
+        tracker(&dir).args(["create", &format!("t{i}")]).assert().success();
+    }
+    let out = Command::cargo_bin("tracker")
+        .unwrap()
+        .current_dir(dir.path())
+        .env("NO_COLOR", "1")
+        .arg("list")
+        .output()
+        .unwrap();
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    let line1 = stdout.lines().find(|l| l.starts_with("#1 ")).unwrap();
+    let line10 = stdout.lines().find(|l| l.starts_with("#10")).unwrap();
+    // The id column widens to 2, so the priority column aligns on both rows.
+    assert_eq!(
+        line1.find("medium"),
+        line10.find("medium"),
+        "columns should align regardless of id digit width"
+    );
+}
+
+#[test]
+fn reopen_rejects_done() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "x"]).assert().success();
+    tracker(&dir).args(["update", "1", "-s", "in-progress"]).assert().success();
+    tracker(&dir).args(["update", "1", "-s", "done"]).assert().success();
+    // reopen only un-closes; a done issue is not reopenable (Option-A scope).
+    tracker(&dir)
+        .args(["reopen", "1"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("not closed"));
+}
+
+#[test]
+fn label_modes_are_mutually_exclusive() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "x", "-l", "a"]).assert().success();
+    tracker(&dir)
+        .args(["update", "1", "--remove-label", "a", "--add-label", "b"])
+        .assert()
+        .failure();
+    tracker(&dir)
+        .args(["update", "1", "--remove-label", "a", "--clear-labels"])
+        .assert()
+        .failure();
+}
+
+#[test]
 fn commands_require_init() {
     let dir = tempfile::tempdir().unwrap();
     Command::cargo_bin("tracker")
