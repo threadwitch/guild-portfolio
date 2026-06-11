@@ -132,6 +132,45 @@ fn multi_value_status_filter_uses_or() {
 }
 
 #[test]
+fn labels_are_deduped_on_write() {
+    let dir = init_repo();
+    // "bug"/"Bug"/"bug" all collapse to a single "bug".
+    tracker(&dir)
+        .args(["create", "x", "--label", "bug", "--label", "Bug", "--label", "bug"])
+        .assert()
+        .success();
+    tracker(&dir)
+        .args(["show", "1"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Labels:").and(predicate::str::contains("bug, bug").not()));
+}
+
+#[test]
+fn list_filter_rejects_empty_label() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "x", "--label", "bug"]).assert().success();
+    // Empty filter errors like an empty write, instead of silently matching nothing.
+    tracker(&dir)
+        .args(["list", "--label", ""])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("label cannot be empty"));
+}
+
+#[test]
+fn list_filter_trims_label() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "x", "--label", "bug"]).assert().success();
+    // Surrounding whitespace is trimmed on read, matching the stored "bug".
+    tracker(&dir)
+        .args(["list", "--label", "  bug  "])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("x"));
+}
+
+#[test]
 fn labels_are_normalized_and_filter_is_case_insensitive() {
     let dir = init_repo();
     tracker(&dir).args(["create", "x", "--label", "BUG"]).assert().success();

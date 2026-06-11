@@ -159,16 +159,17 @@ fn priority_colored(priority: &data::Priority, pad: usize) -> String {
 }
 
 fn normalize_labels(labels: Vec<String>) -> Result<Vec<String>> {
-    labels
-        .into_iter()
-        .map(|l| {
-            let l = l.trim().to_lowercase();
-            if l.is_empty() {
-                anyhow::bail!("label cannot be empty");
-            }
-            Ok(l)
-        })
-        .collect()
+    let mut out: Vec<String> = Vec::new();
+    for l in labels {
+        let l = l.trim().to_lowercase();
+        if l.is_empty() {
+            anyhow::bail!("label cannot be empty");
+        }
+        if !out.contains(&l) {
+            out.push(l);
+        }
+    }
+    Ok(out)
 }
 
 fn cmd_init() -> Result<()> {
@@ -398,6 +399,7 @@ fn cmd_update(id: u32, title: Option<String>, description: Option<String>, statu
 
 fn cmd_list(status_filter: Vec<data::Status>, priority_filter: Vec<data::Priority>, label_filter: Vec<String>) -> Result<()> {
     let store = data::load_store()?;
+    let label_filter = normalize_labels(label_filter)?;
     let has_other_filter = !priority_filter.is_empty() || !label_filter.is_empty();
     let mut visible: Vec<&data::Issue> = store.issues
         .iter()
@@ -416,7 +418,7 @@ fn cmd_list(status_filter: Vec<data::Status>, priority_filter: Vec<data::Priorit
         .filter(|i| priority_filter.is_empty() || priority_filter.contains(&i.priority))
         .filter(|i| {
             label_filter.is_empty()
-                || label_filter.iter().any(|l| i.labels.contains(&l.to_lowercase()))
+                || label_filter.iter().any(|l| i.labels.contains(l))
         })
         .collect();
 

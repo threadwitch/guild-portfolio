@@ -377,13 +377,13 @@
       "id": 34,
       "title": "`normalize_labels` does not de-dupe on on create or replace",
       "description": "The `add-label` command does deduplication, but the other commands don't.  Unify the behavior to always deduplicate.",
-      "status": "open",
+      "status": "done",
       "priority": "medium",
       "labels": [
         "bug"
       ],
       "created_at": "2026-06-11T00:37:05.772764070Z",
-      "updated_at": "2026-06-11T00:37:05.772764070Z"
+      "updated_at": "2026-06-11T05:25:31.856448118Z"
     },
     {
       "id": 35,
@@ -473,25 +473,25 @@
       "id": 42,
       "title": "Empty label filter fails silently instead of erroring.",
       "description": "The label write rejects empty labels being written, but the filter for reading issues doesn't.  Make them match.",
-      "status": "open",
+      "status": "done",
       "priority": "high",
       "labels": [
         "bug"
       ],
       "created_at": "2026-06-11T01:20:53.943106064Z",
-      "updated_at": "2026-06-11T01:20:53.943106064Z"
+      "updated_at": "2026-06-11T05:25:31.854198452Z"
     },
     {
       "id": 43,
       "title": "Filter normalization is ad hoc, and not consistent across read/write ops.",
       "description": "Like issue 42, this is another inconsistency between read and write.  Labels are trimmed on write, but not on read.  This means that an extra space on the list filter will error and find no issues.  All read and write ops should share the same input validation for consistency, if possible.",
-      "status": "open",
+      "status": "done",
       "priority": "high",
       "labels": [
         "bug"
       ],
       "created_at": "2026-06-11T01:23:59.533216686Z",
-      "updated_at": "2026-06-11T01:23:59.533216686Z"
+      "updated_at": "2026-06-11T05:25:31.855423752Z"
     },
     {
       "id": 44,
