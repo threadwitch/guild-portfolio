@@ -390,6 +390,19 @@ fn broken_pipe_exits_quietly() {
 }
 
 #[test]
+fn completions_carry_install_header() {
+    let dir = tempfile::tempdir().unwrap();
+    // The nushell output documents the easy-to-miss two-step / `use completions *`.
+    Command::cargo_bin("tracker")
+        .unwrap()
+        .current_dir(dir.path())
+        .args(["completions", "nushell"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("use completions *").and(predicate::str::contains("save -f")));
+}
+
+#[test]
 fn completions_generate_for_all_shells() {
     // Completions are static; they don't need an initialized tracker.
     let dir = tempfile::tempdir().unwrap();

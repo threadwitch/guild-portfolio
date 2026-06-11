@@ -289,9 +289,39 @@ fn cmd_close(id: u32) -> Result<()> {
     Ok(())
 }
 
+/// Per-shell install instructions, emitted as comments atop the script so the
+/// (sometimes non-obvious) setup steps ship with the output itself.
+fn completions_install_help(shell: &CompletionShell) -> &'static str {
+    match shell {
+        CompletionShell::Bash => "\
+# tracker completions for bash. Install with either:
+#   source <(tracker completions bash)              # add to ~/.bashrc
+#   tracker completions bash > ~/.local/share/bash-completion/completions/tracker
+",
+        CompletionShell::Zsh => "\
+# tracker completions for zsh. Save to a directory on your $fpath, e.g.:
+#   tracker completions zsh > ~/.zfunc/_tracker
+#   # in ~/.zshrc, before `compinit`:  fpath=(~/.zfunc $fpath)
+",
+        CompletionShell::Fish => "\
+# tracker completions for fish. Install with:
+#   tracker completions fish > ~/.config/fish/completions/tracker.fish
+",
+        CompletionShell::Nushell => "\
+# tracker completions for nushell. Two steps — `source` runs at PARSE time, so
+# the file must exist before the source line is parsed (don't do both at once):
+#   1) tracker completions nushell | save -f ~/.config/nushell/tracker-completions.nu
+#   2) add these two lines to your config.nu:
+#        source ~/.config/nushell/tracker-completions.nu
+#        use completions *
+",
+    }
+}
+
 fn cmd_completions(shell: CompletionShell) -> Result<()> {
     let mut cmd = Cli::command();
     let mut out = std::io::stdout();
+    write!(out, "{}", completions_install_help(&shell)).context("could not write completions")?;
     match shell {
         CompletionShell::Bash => clap_complete::generate(clap_complete::Shell::Bash, &mut cmd, "tracker", &mut out),
         CompletionShell::Zsh => clap_complete::generate(clap_complete::Shell::Zsh, &mut cmd, "tracker", &mut out),
