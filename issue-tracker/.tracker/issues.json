@@ -449,13 +449,13 @@
       "id": 40,
       "title": "No way to remove a single label from an issue.",
       "description": "There's no `--label-remove` to remove a single label, it's all or nothing.  Since the rest of the ergonomics for the labels are implemented, we should finish this last little issue.",
-      "status": "open",
+      "status": "done",
       "priority": "high",
       "labels": [
         "feature"
       ],
       "created_at": "2026-06-11T01:17:39.998495824Z",
-      "updated_at": "2026-06-11T01:17:39.998495824Z"
+      "updated_at": "2026-06-11T05:32:28.823264811Z"
     },
     {
       "id": 41,

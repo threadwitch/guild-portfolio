@@ -95,6 +95,9 @@ enum Command {
         /// Remove all labels from the issue
         #[arg(long)]
         clear_labels: bool,
+        /// Remove one or more specific labels; can be repeated
+        #[arg(long, conflicts_with_all = ["label", "add_label", "clear_labels"])]
+        remove_label: Vec<String>,
     },
 }
 
@@ -118,7 +121,7 @@ fn main() {
         Command::Close { id } => cmd_close(id),
         Command::Edit { id } => cmd_edit(id),
         Command::Completions { shell } => cmd_completions(shell),
-        Command::Update { id, title, description, status, priority, label, add_label, clear_labels } => cmd_update(id, title, description, status, priority, label, add_label, clear_labels),
+        Command::Update { id, title, description, status, priority, label, add_label, clear_labels, remove_label } => cmd_update(id, title, description, status, priority, label, add_label, clear_labels, remove_label),
     };
     if let Err(e) = result {
         eprintln!("{} {e}", "error:".red().bold());
@@ -339,10 +342,10 @@ fn cmd_edit(id: u32) -> Result<()> {
     Ok(())
 }
 
-fn cmd_update(id: u32, title: Option<String>, description: Option<String>, status: Option<data::Status>, priority: Option<data::Priority>, labels: Vec<String>, add_labels: Vec<String>, clear_labels: bool) -> Result<()> {
+fn cmd_update(id: u32, title: Option<String>, description: Option<String>, status: Option<data::Status>, priority: Option<data::Priority>, labels: Vec<String>, add_labels: Vec<String>, clear_labels: bool, remove_labels: Vec<String>) -> Result<()> {
     if title.is_none() && description.is_none() && status.is_none() && priority.is_none()
-        && labels.is_empty() && add_labels.is_empty() && !clear_labels {
-        anyhow::bail!("at least one option required (--title, --description, --status, --priority, --label, --add-label, --clear-labels)");
+        && labels.is_empty() && add_labels.is_empty() && !clear_labels && remove_labels.is_empty() {
+        anyhow::bail!("at least one option required (--title, --description, --status, --priority, --label, --add-label, --clear-labels, --remove-label)");
     }
     let _lock = data::lock_exclusive()?;
     let mut store = data::load_store()?;
@@ -388,6 +391,9 @@ fn cmd_update(id: u32, title: Option<String>, description: Option<String>, statu
                 issue.labels.push(l);
             }
         }
+    } else if !remove_labels.is_empty() {
+        let to_remove = normalize_labels(remove_labels)?;
+        issue.labels.retain(|l| !to_remove.contains(l));
     } else if !labels.is_empty() {
         issue.labels = normalize_labels(labels)?;
     }

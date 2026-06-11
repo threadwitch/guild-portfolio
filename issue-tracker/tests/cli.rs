@@ -211,6 +211,27 @@ fn label_append_and_clear() {
 }
 
 #[test]
+fn label_remove_single() {
+    let dir = init_repo();
+    tracker(&dir)
+        .args(["create", "x", "--label", "bug", "--label", "urgent", "--label", "ui"])
+        .assert()
+        .success();
+    // Remove one (case/space-insensitive); the others remain.
+    tracker(&dir).args(["update", "1", "--remove-label", " Urgent "]).assert().success();
+    tracker(&dir).args(["show", "1"]).assert().success().stdout(
+        predicate::str::contains("bug, ui").and(predicate::str::contains("urgent").not()),
+    );
+    // Removing an absent label is a forgiving no-op (still succeeds).
+    tracker(&dir).args(["update", "1", "--remove-label", "nope"]).assert().success();
+    tracker(&dir)
+        .args(["show", "1"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("bug, ui"));
+}
+
+#[test]
 fn description_set_and_clear() {
     let dir = init_repo();
     tracker(&dir).args(["create", "x", "--description", "hello"]).assert().success();
