@@ -425,25 +425,25 @@
       "id": 38,
       "title": "DESIGN.md is out of date in significant ways.",
       "description": "The design doc is out of date because I used it as the starting point, and haven't updated it.  The changes are partially documented in PROCESS.md, and the actualy work is saved in the tracker log itself.  DESIGN.md is a living document to give the agents context for the current state, and to top it off, there's no basic documentation of the tool without digging through the `--help` options.",
-      "status": "in_progress",
+      "status": "done",
       "priority": "critical",
       "labels": [
         "docs"
       ],
       "created_at": "2026-06-11T01:12:27.090684757Z",
-      "updated_at": "2026-06-11T06:37:07.949149724Z"
+      "updated_at": "2026-06-11T06:44:36.932577174Z"
     },
     {
       "id": 39,
       "title": "No README for the project.",
       "description": "This project needs a README to explain the basic functions and lay out the current state.  While this is a high priority, it should only be tackled once the features are stable.  Save until all the other issues for this round of work are handled.",
-      "status": "open",
+      "status": "done",
       "priority": "high",
       "labels": [
         "docs"
       ],
       "created_at": "2026-06-11T01:15:29.924051113Z",
-      "updated_at": "2026-06-11T01:15:29.924051113Z"
+      "updated_at": "2026-06-11T06:47:46.148679553Z"
     },
     {
       "id": 40,
