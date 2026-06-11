@@ -401,25 +401,25 @@
       "id": 36,
       "title": "Temp file on the read-error path isn't cleaned up.",
       "description": "This is a case where we need to use the proper Rust idiom for tempfile cleanup because the editor-failure path cleans up after itself automatically, but other errors don't.  This leaves orphaned files in /tmp.",
-      "status": "open",
+      "status": "done",
       "priority": "medium",
       "labels": [
         "bug"
       ],
       "created_at": "2026-06-11T00:59:15.971460762Z",
-      "updated_at": "2026-06-11T00:59:15.971460762Z"
+      "updated_at": "2026-06-11T05:39:47.461410858Z"
     },
     {
       "id": 37,
       "title": "Predictable temp path in a shared directory.",
       "description": "The temp files created by opening a description in an editor are named predictably, which means that they could be pre-emptively symlinked, and cause issues.  There's also the issue where this can cause collisions.  There's an idiomatic fix ni `tempfile::NamedTempFile` and we should use it.",
-      "status": "open",
+      "status": "done",
       "priority": "high",
       "labels": [
         "bug"
       ],
       "created_at": "2026-06-11T01:04:09.123505375Z",
-      "updated_at": "2026-06-11T01:04:09.123505375Z"
+      "updated_at": "2026-06-11T05:39:47.460230171Z"
     },
     {
       "id": 38,

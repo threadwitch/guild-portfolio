@@ -284,6 +284,25 @@ fn edit_updates_description_via_editor() {
 }
 
 #[test]
+fn edit_cleans_up_temp_file() {
+    let dir = init_repo();
+    tracker(&dir).args(["create", "x"]).assert().success();
+    // Point the child's TMPDIR at an isolated dir so we can assert the edit
+    // temp file (created there by tempfile) is gone afterward.
+    let tmpdir = tempfile::tempdir().unwrap();
+    let newdesc = dir.path().join("nd.txt");
+    std::fs::write(&newdesc, "edited body").unwrap();
+    tracker(&dir)
+        .args(["edit", "1"])
+        .env("EDITOR", format!("cp {}", newdesc.display()))
+        .env("TMPDIR", tmpdir.path())
+        .assert()
+        .success();
+    let leftover = std::fs::read_dir(tmpdir.path()).unwrap().count();
+    assert_eq!(leftover, 0, "edit temp file was not cleaned up");
+}
+
+#[test]
 fn edit_without_editor_errors() {
     let dir = init_repo();
     tracker(&dir).args(["create", "x"]).assert().success();

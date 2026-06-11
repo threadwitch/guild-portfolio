@@ -313,9 +313,16 @@ fn cmd_edit(id: u32) -> Result<()> {
         .position(|i| i.id == id)
         .ok_or_else(|| anyhow::anyhow!("no issue with id #{id}"))?;
 
-    let temp_path = std::env::temp_dir().join(format!("tracker-edit-{id}.md"));
-    std::fs::write(&temp_path, store.issues[pos].description.as_deref().unwrap_or(""))
+    // Uniquely-named temp file (random, O_EXCL — no symlink/collision risk) seeded
+    // with the current description. It auto-deletes when `tmp` drops, so every exit
+    // path (including errors) cleans up.
+    let mut tmp = tempfile::Builder::new()
+        .prefix("tracker-edit-")
+        .suffix(".md")
+        .tempfile()
         .context("could not create temp file for editing")?;
+    tmp.write_all(store.issues[pos].description.as_deref().unwrap_or("").as_bytes())
+        .context("could not write temp file for editing")?;
 
     // `sh -c '<editor> "$1"' sh <path>` — passes the path as $1 so editors with
     // their own args (e.g. `code --wait`) work and the path can't be re-split.
@@ -323,16 +330,14 @@ fn cmd_edit(id: u32) -> Result<()> {
         .arg("-c")
         .arg(format!("{editor} \"$1\""))
         .arg("sh")
-        .arg(&temp_path)
+        .arg(tmp.path())
         .status()
         .context("could not launch editor")?;
     if !status.success() {
-        let _ = std::fs::remove_file(&temp_path);
         anyhow::bail!("editor exited with an error; description unchanged");
     }
 
-    let edited = std::fs::read_to_string(&temp_path).context("could not read edited description")?;
-    let _ = std::fs::remove_file(&temp_path);
+    let edited = std::fs::read_to_string(tmp.path()).context("could not read edited description")?;
 
     let trimmed = edited.trim();
     store.issues[pos].description = if trimmed.is_empty() { None } else { Some(trimmed.to_string()) };
