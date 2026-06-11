@@ -381,9 +381,19 @@ fn finds_tracker_from_subdirectory() {
 }
 
 #[test]
-fn updated_at_is_recorded_and_shown() {
+fn updated_at_recorded_only_after_modification() {
     let dir = init_repo();
     tracker(&dir).args(["create", "x"]).assert().success();
+    // Fresh issue: no updated_at, no Updated line.
+    let json = std::fs::read_to_string(dir.path().join(".tracker/issues.json")).unwrap();
+    assert!(!json.contains("updated_at"), "a freshly created issue should have no updated_at");
+    tracker(&dir)
+        .args(["show", "1"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Updated:").not());
+    // After a modification it appears.
+    tracker(&dir).args(["update", "1", "--priority", "high"]).assert().success();
     let json = std::fs::read_to_string(dir.path().join(".tracker/issues.json")).unwrap();
     assert!(json.contains("updated_at"));
     tracker(&dir)

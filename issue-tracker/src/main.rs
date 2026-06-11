@@ -203,7 +203,6 @@ fn cmd_create(title: String, description: Option<String>, priority: data::Priori
     let _lock = data::lock_exclusive()?;
     let mut store = data::load_store()?;
     let id = store.next_id;
-    let now = chrono::Utc::now();
     let issue = data::Issue {
         id,
         title: title.clone(),
@@ -211,8 +210,8 @@ fn cmd_create(title: String, description: Option<String>, priority: data::Priori
         status: data::Status::Open,
         priority,
         labels,
-        created_at: now,
-        updated_at: Some(now),
+        created_at: chrono::Utc::now(),
+        updated_at: None,
     };
     store.issues.push(issue);
     store.next_id += 1;
